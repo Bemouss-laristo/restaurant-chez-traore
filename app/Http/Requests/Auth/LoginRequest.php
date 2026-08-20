@@ -42,7 +42,15 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // On exige is_active = true : un compte désactivé ne peut pas se connecter,
+        // même avec le bon mot de passe. Le message d'erreur reste générique pour
+        // ne pas révéler qu'un compte existe.
+        $credentials = array_merge(
+            $this->only('email', 'password'),
+            ['is_active' => true],
+        );
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

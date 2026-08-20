@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#7f1d1d"/>
+  <circle cx="200" cy="128" r="66" fill="#ffffff" opacity="0.14"/>
+  <circle cx="200" cy="128" r="44" fill="#ffffff" opacity="0.22"/>
+  <rect x="150" y="92" width="5" height="72" rx="2" fill="#ffffff" opacity="0.6"/>
+  <rect x="246" y="92" width="5" height="72" rx="2" fill="#ffffff" opacity="0.6"/>
+  <text x="200" y="246" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#ffffff">Plats</text>
+</svg>

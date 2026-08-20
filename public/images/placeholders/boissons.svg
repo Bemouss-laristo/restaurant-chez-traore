@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#155e75"/>
+  <path d="M168 96 h64 l-8 78 a8 8 0 0 1 -8 7 h-24 a8 8 0 0 1 -8 -7 z" fill="#ffffff" opacity="0.22"/>
+  <rect x="182" y="80" width="36" height="8" rx="4" fill="#ffffff" opacity="0.5"/>
+  <rect x="214" y="70" width="4" height="30" rx="2" fill="#ffffff" opacity="0.5"/>
+  <text x="200" y="246" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#ffffff">Boissons</text>
+</svg>

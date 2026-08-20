@@ -5,16 +5,45 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('dashboard') }}" class="text-lg font-semibold text-gray-800 whitespace-nowrap">
+                        Chez <span class="text-amber-600">Traoré</span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        Tableau de bord
                     </x-nav-link>
+
+                    <x-nav-link :href="route('sales.create')" :active="request()->routeIs('sales.*')">
+                        Vente
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
+                        Caisse
+                    </x-nav-link>
+
+                    @if (auth()->user()->isAdmin() || auth()->user()->isGerant())
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                            Produits
+                        </x-nav-link>
+                        <x-nav-link :href="route('stock-items.index')" :active="request()->routeIs('stock-items.*')">
+                            Stock
+                        </x-nav-link>
+                        <x-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
+                            Dépenses
+                        </x-nav-link>
+                        <x-nav-link :href="route('reports.daily')" :active="request()->routeIs('reports.*')">
+                            Rapports
+                        </x-nav-link>
+                    @endif
+
+                    @if (auth()->user()->isAdmin())
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                            Employés
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -35,7 +64,7 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            Profil
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -45,7 +74,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                Déconnexion
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -68,8 +97,37 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                Tableau de bord
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('sales.create')" :active="request()->routeIs('sales.*')">
+                Vente
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
+                Caisse
+            </x-responsive-nav-link>
+
+            @if (auth()->user()->isAdmin() || auth()->user()->isGerant())
+                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                    Produits
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('stock-items.index')" :active="request()->routeIs('stock-items.*')">
+                    Stock
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
+                    Dépenses
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('reports.daily')" :active="request()->routeIs('reports.*')">
+                    Rapports
+                </x-responsive-nav-link>
+            @endif
+
+            @if (auth()->user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                    Employés
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -81,7 +139,7 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    Profil
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
@@ -91,7 +149,7 @@
                     <x-responsive-nav-link :href="route('logout')"
                             onclick="event.preventDefault();
                                         this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        Déconnexion
                     </x-responsive-nav-link>
                 </form>
             </div>
