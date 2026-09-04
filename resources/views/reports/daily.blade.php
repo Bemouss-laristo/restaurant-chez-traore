@@ -14,6 +14,7 @@
                 <label class="text-sm text-gray-600">Date :</label>
                 <input type="date" name="date" value="{{ $date->toDateString() }}" class="border-gray-300 rounded-md shadow-sm" />
                 <button class="px-4 py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Afficher</button>
+                <span class="text-xs text-gray-500">Journée commerciale : de 19h jusqu'au lendemain 5h.</span>
             </form>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -58,6 +59,33 @@
                     @empty
                         <p class="text-sm text-gray-500">Aucune vente.</p>
                     @endforelse
+                </div>
+            </div>
+
+            {{-- Liste complète des produits vendus (quantités par produit) --}}
+            <div class="bg-white shadow sm:rounded-lg p-6">
+                <h3 class="font-medium text-gray-800 mb-4">Tous les produits vendus ce jour</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-500">
+                                <th class="px-3 py-2">Produit</th>
+                                <th class="px-3 py-2 text-right">Quantité vendue</th>
+                                <th class="px-3 py-2 text-right">Chiffre d'affaires</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($report['productsSold'] as $p)
+                                <tr>
+                                    <td class="px-3 py-2 font-medium text-gray-900">{{ $p->name }}</td>
+                                    <td class="px-3 py-2 text-right font-medium">{{ (int) $p->qty }}</td>
+                                    <td class="px-3 py-2 text-right text-gray-600">@mru($p->revenue)</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="px-3 py-4 text-center text-gray-500">Aucune vente ce jour.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

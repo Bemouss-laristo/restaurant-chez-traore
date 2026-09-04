@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\DashboardService;
+use App\Support\BusinessDay;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -22,6 +24,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'today' => $today,
+            'businessDate' => Carbon::parse(BusinessDay::today()),
             'canSeeFinance' => $canSeeFinance,
             'topProducts' => $canSeeFinance ? $this->dashboard->topProducts() : collect(),
             'lowStock' => $canSeeFinance ? $this->dashboard->lowStockItems() : collect(),

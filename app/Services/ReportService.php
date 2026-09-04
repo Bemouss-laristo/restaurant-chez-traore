@@ -6,46 +6,61 @@ namespace App\Services;
 
 use App\Models\Expense;
 use App\Models\Sale;
+use App\Models\StockItem;
+use App\Support\BusinessDay;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Tous les calculs suivent la « journée commerciale » (19h → 5h) :
+ *  - les VENTES sont rattachées par leur horaire réel (fenêtre décalée) ;
+ *  - les DÉPENSES sont datées à la main, donc rattachées par leur date directe.
+ */
 final class ReportService
 {
-    /** Rapport d'une journée. */
+    /** Rapport d'une journée commerciale. */
     public function daily(CarbonInterface $date): array
     {
-        $salesTotal = (float) Sale::whereDate('sold_at', $date)->sum('total');
-        $orders = Sale::whereDate('sold_at', $date)->count();
-        $expensesTotal = (float) Expense::whereDate('spent_at', $date)->sum('amount');
+        $d = $date->toDateString();
+        [$start, $end] = BusinessDay::window($d);
+
+        $salesTotal = (float) Sale::whereBetween('sold_at', [$start, $end])->sum('total');
+        $orders = Sale::whereBetween('sold_at', [$start, $end])->count();
+        $expensesTotal = (float) Expense::whereDate('spent_at', $d)->sum('amount');
 
         return [
             'salesTotal' => $salesTotal,
             'orders' => $orders,
             'expensesTotal' => $expensesTotal,
             'profit' => $salesTotal - $expensesTotal,
-            'byPayment' => Sale::whereDate('sold_at', $date)
+            'byPayment' => Sale::whereBetween('sold_at', [$start, $end])
                 ->selectRaw('payment_method, SUM(total) as total')
                 ->groupBy('payment_method')
                 ->pluck('total', 'payment_method'),
-            'byCategory' => Expense::whereDate('spent_at', $date)
+            'byCategory' => Expense::whereDate('spent_at', $d)
                 ->selectRaw('expense_category, SUM(amount) as total')
                 ->groupBy('expense_category')
                 ->pluck('total', 'expense_category'),
-            'topProducts' => $this->topProducts($date, $date),
+            // Top 5 pour l'aperçu, et la liste COMPLÈTE de tout ce qui a été vendu.
+            'topProducts' => $this->productsSoldBetween($start, $end, 5),
+            'productsSold' => $this->productsSoldBetween($start, $end),
         ];
     }
 
-    /** Rapport d'une semaine (7 jours à partir du lundi). */
+    /** Rapport d'une semaine (7 journées commerciales). */
     public function weekly(CarbonInterface $start): array
     {
         $start = $start->copy()->startOfDay();
 
         $rows = collect(range(0, 6))->map(function (int $i) use ($start) {
             $day = $start->copy()->addDays($i);
-            $sales = (float) Sale::whereDate('sold_at', $day)->sum('total');
-            $expenses = (float) Expense::whereDate('spent_at', $day)->sum('amount');
+            $d = $day->toDateString();
+            [$ws, $we] = BusinessDay::window($d);
+
+            $sales = (float) Sale::whereBetween('sold_at', [$ws, $we])->sum('total');
+            $expenses = (float) Expense::whereDate('spent_at', $d)->sum('amount');
 
             return [
                 'date' => $day,
@@ -72,59 +87,89 @@ final class ReportService
         ];
     }
 
-    /** Rapport d'un mois. */
+    /** Rapport d'un mois (par journée commerciale). */
     public function monthly(int $year, int $month): array
     {
-        $start = Carbon::create($year, $month, 1)->startOfMonth();
-        $end = $start->copy()->endOfMonth();
+        $first = Carbon::create($year, $month, 1)->startOfMonth();
+        $last = $first->copy()->endOfMonth();
+        $hour = BusinessDay::startHour();
 
-        // Ventes agrégées par jour, en une seule requête.
-        $salesByDay = Sale::whereBetween('sold_at', [$start, $end])
-            ->selectRaw('DATE(sold_at) as d, SUM(total) as total')
+        [$rangeStart] = BusinessDay::window($first->toDateString());
+        [, $rangeEnd] = BusinessDay::window($last->toDateString());
+
+        // Ventes agrégées par journée commerciale (date décalée de l'heure de reset).
+        // $hour vient de la config (entier de confiance), on peut l'insérer directement.
+        $salesByDay = Sale::whereBetween('sold_at', [$rangeStart, $rangeEnd])
+            ->selectRaw("DATE(sold_at - INTERVAL {$hour} HOUR) as d, SUM(total) as total")
             ->groupBy('d')
             ->pluck('total', 'd');
 
-        $perDay = collect(range(1, $start->daysInMonth))->map(function (int $day) use ($start, $salesByDay) {
-            $key = $start->copy()->day($day)->toDateString();
+        $perDay = collect(range(1, $first->daysInMonth))->map(function (int $day) use ($first, $salesByDay) {
+            $key = $first->copy()->day($day)->toDateString();
 
-            return [
-                'day' => $day,
-                'sales' => (float) ($salesByDay[$key] ?? 0),
-            ];
+            return ['day' => $day, 'sales' => (float) ($salesByDay[$key] ?? 0)];
         });
 
-        $salesTotal = (float) Sale::whereBetween('sold_at', [$start, $end])->sum('total');
-        $expensesTotal = (float) Expense::whereBetween('spent_at', [$start, $end])->sum('amount');
+        $monthStart = $first->copy()->startOfDay();
+        $monthEnd = $last->copy()->endOfDay();
+        $salesTotal = (float) Sale::whereBetween('sold_at', [$rangeStart, $rangeEnd])->sum('total');
+        $expensesTotal = (float) Expense::whereBetween('spent_at', [$monthStart, $monthEnd])->sum('amount');
 
         return [
-            'start' => $start,
+            'start' => $first,
             'perDay' => $perDay,
             'salesTotal' => $salesTotal,
             'expensesTotal' => $expensesTotal,
             'profit' => $salesTotal - $expensesTotal,
-            'byCategory' => Expense::whereBetween('spent_at', [$start, $end])
+            'byCategory' => Expense::whereBetween('spent_at', [$monthStart, $monthEnd])
                 ->selectRaw('expense_category, SUM(amount) as total')
                 ->groupBy('expense_category')
                 ->pluck('total', 'expense_category'),
-            'topProducts' => $this->topProducts($start, $end),
+            'topProducts' => $this->productsSoldBetween($rangeStart, $rangeEnd, 5),
         ];
     }
 
-    /** Produits les plus vendus entre deux dates (bornes incluses). */
-    private function topProducts(CarbonInterface $from, CarbonInterface $to, int $limit = 5): Collection
+    /**
+     * Contrôle du stock d'une journée : par article, acheté (entrées),
+     * vendu/sorti (sorties) et reste actuel.
+     */
+    public function stockControl(string $date): Collection
     {
-        return DB::table('sale_items')
+        [$start, $end] = BusinessDay::window($date);
+
+        return StockItem::orderBy('name')->get()->map(function (StockItem $item) use ($start, $end) {
+            $in = (float) $item->movements()
+                ->where('type', 'in')
+                ->whereBetween('created_at', [$start, $end])
+                ->sum('quantity');
+            $out = (float) $item->movements()
+                ->where('type', 'out')
+                ->whereBetween('created_at', [$start, $end])
+                ->sum('quantity');
+
+            return ['item' => $item, 'in' => $in, 'out' => $out];
+        });
+    }
+
+    /** Produits vendus entre deux instants, triés par quantité (liste complète si $limit null). */
+    private function productsSoldBetween(Carbon $start, Carbon $end, ?int $limit = null): Collection
+    {
+        $query = DB::table('sale_items')
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
-            ->whereBetween('sales.sold_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
+            ->whereBetween('sales.sold_at', [$start, $end])
             ->groupBy('products.id', 'products.name')
             ->select(
                 'products.name',
                 DB::raw('SUM(sale_items.quantity) as qty'),
                 DB::raw('SUM(sale_items.line_total) as revenue'),
             )
-            ->orderByDesc('qty')
-            ->limit($limit)
-            ->get();
+            ->orderByDesc('qty');
+
+        if ($limit !== null) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Expense;
 use App\Models\Sale;
 use App\Models\StockItem;
 use App\Models\User;
+use App\Support\BusinessDay;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -18,14 +19,16 @@ final class DashboardService
     {
     }
 
-    /** Chiffres clés du jour pour l'utilisateur connecté. */
+    /** Chiffres clés de la journée commerciale en cours (19h → 5h). */
     public function todayStats(User $user): array
     {
-        $today = today();
+        $date = BusinessDay::today();
+        [$start, $end] = BusinessDay::window($date);
 
-        $sales = (float) Sale::whereDate('sold_at', $today)->sum('total');
-        $expenses = (float) Expense::whereDate('spent_at', $today)->sum('amount');
-        $orders = Sale::whereDate('sold_at', $today)->count();
+        $sales = (float) Sale::whereBetween('sold_at', [$start, $end])->sum('total');
+        $orders = Sale::whereBetween('sold_at', [$start, $end])->count();
+        // Les dépenses sont datées à la main : on les rattache par date commerciale directe.
+        $expenses = (float) Expense::whereDate('spent_at', $date)->sum('amount');
 
         $session = $this->cash->currentFor($user);
 

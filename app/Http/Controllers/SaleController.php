@@ -54,6 +54,14 @@ class SaleController extends Controller
         return view('sales.index', ['sales' => $sales]);
     }
 
+    /** Détail d'une vente : produits, quantités, prix. */
+    public function show(Sale $sale): View
+    {
+        $sale->load(['items.product', 'user', 'cashSession']);
+
+        return view('sales.show', ['sale' => $sale]);
+    }
+
     public function store(StoreSaleRequest $request): RedirectResponse
     {
         $data = $request->validated();

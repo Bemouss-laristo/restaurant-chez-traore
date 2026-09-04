@@ -1,3 +1,4 @@
+@php($pendingOrders = \App\Models\Order::pending()->count())
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,6 +23,13 @@
 
                     <x-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
                         Caisse
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                        Commandes
+                        @if ($pendingOrders > 0)
+                            <span class="ms-1 inline-flex items-center justify-center px-1.5 text-xs font-bold rounded-full bg-amber-500 text-white">{{ $pendingOrders }}</span>
+                        @endif
                     </x-nav-link>
 
                     @if (auth()->user()->isAdmin() || auth()->user()->isGerant())
@@ -106,6 +114,10 @@
 
             <x-responsive-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
                 Caisse
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                Commandes @if ($pendingOrders > 0) ({{ $pendingOrders }}) @endif
             </x-responsive-nav-link>
 
             @if (auth()->user()->isAdmin() || auth()->user()->isGerant())

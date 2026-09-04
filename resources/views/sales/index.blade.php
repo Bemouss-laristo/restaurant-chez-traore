@@ -22,20 +22,26 @@
                                 <th class="px-4 py-2 text-right">Articles</th>
                                 <th class="px-4 py-2">Paiement</th>
                                 <th class="px-4 py-2 text-right">Total</th>
+                                <th class="px-4 py-2 text-right">Détail</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($sales as $sale)
-                                <tr>
-                                    <td class="px-4 py-3 font-mono text-xs text-gray-700">{{ $sale->sale_number }}</td>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 font-mono text-xs">
+                                        <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">{{ $sale->sale_number }}</a>
+                                    </td>
                                     <td class="px-4 py-3 text-gray-600">{{ $sale->sold_at->format('d/m/Y H:i') }}</td>
                                     <td class="px-4 py-3 text-gray-600">{{ $sale->user->name }}</td>
                                     <td class="px-4 py-3 text-right text-gray-600">{{ $sale->items_count }}</td>
                                     <td class="px-4 py-3">{{ $sale->payment_method->label() }}</td>
                                     <td class="px-4 py-3 text-right font-medium">@mru($sale->total)</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">Voir</a>
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">Aucune vente enregistrée.</td></tr>
+                                <tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">Aucune vente enregistrée.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

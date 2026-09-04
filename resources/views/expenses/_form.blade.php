@@ -23,7 +23,7 @@
         <div>
             <x-input-label for="spent_at" value="Date" />
             <x-text-input id="spent_at" name="spent_at" type="date" class="mt-1 block w-full"
-                :value="old('spent_at', isset($expense) ? $expense->spent_at->format('Y-m-d') : date('Y-m-d'))" required />
+                :value="old('spent_at', isset($expense) ? $expense->spent_at->format('Y-m-d') : \App\Support\BusinessDay::today())" required />
             <x-input-error :messages="$errors->get('spent_at')" class="mt-2" />
         </div>
     </div>
