@@ -112,7 +112,7 @@
                     </div>
 
                     <div class="mt-5 flex items-center justify-end">
-                        <button class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-500">
+                        <button class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
                             Calculer les écarts
                         </button>
                     </div>
