@@ -11,6 +11,7 @@ use App\Http\Controllers\PublicOrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockItemController;
+use App\Http\Controllers\StockReconciliationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'role:admin,gerant,caissier'])->group(function () {
     Route::get('ventes', [SaleController::class, 'create'])->name('sales.create');
     Route::get('ventes/historique', [SaleController::class, 'index'])->name('sales.index');
     Route::post('ventes', [SaleController::class, 'store'])->name('sales.store');
+    Route::get('ventes/{sale}/ticket', [SaleController::class, 'receipt'])->name('sales.receipt');
     Route::get('ventes/{sale}', [SaleController::class, 'show'])->name('sales.show');
 
     // Commandes en ligne reçues des clients.
@@ -70,6 +72,8 @@ Route::middleware(['auth', 'role:admin,gerant'])->group(function () {
     Route::get('rapports/hebdomadaire', [ReportController::class, 'weekly'])->name('reports.weekly');
     Route::get('rapports/mensuel', [ReportController::class, 'monthly'])->name('reports.monthly');
     Route::get('rapports/stock', [ReportController::class, 'stock'])->name('reports.stock');
+    Route::get('rapports/reconciliation', [StockReconciliationController::class, 'index'])->name('reconciliation.index');
+    Route::post('rapports/reconciliation', [StockReconciliationController::class, 'store'])->name('reconciliation.store');
 
     Route::put('products/{product}/recipe', [ProductController::class, 'updateRecipe'])->name('products.recipe');
     Route::resource('products', ProductController::class)->except(['show']);

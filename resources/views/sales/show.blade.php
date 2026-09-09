@@ -2,7 +2,11 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Vente {{ $sale->sale_number }}</h2>
-            <a href="{{ route('sales.index') }}" class="text-sm text-indigo-600 hover:underline">← Retour à l'historique</a>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('sales.receipt', $sale) }}" target="_blank"
+                   class="text-sm font-semibold px-3 py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-500">🖨️ Imprimer le ticket</a>
+                <a href="{{ route('sales.index') }}" class="text-sm text-indigo-600 hover:underline">← Retour à l'historique</a>
+            </div>
         </div>
     </x-slot>
 

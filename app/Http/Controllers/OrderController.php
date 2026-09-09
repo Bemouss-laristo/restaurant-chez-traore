@@ -84,7 +84,9 @@ class OrderController extends Controller
             'handled_by' => $user->id,
         ]);
 
-        return back()->with('status', "Commande {$order->order_number} encaissée — vente {$sale->sale_number}.");
+        return back()
+            ->with('status', "Commande {$order->order_number} encaissée — vente {$sale->sale_number}.")
+            ->with('printSaleId', $sale->id);
     }
 
     /** Nombre de commandes en attente (pour le badge / l'alerte en direct). */

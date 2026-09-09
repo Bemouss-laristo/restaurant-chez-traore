@@ -62,6 +62,17 @@ class SaleController extends Controller
         return view('sales.show', ['sale' => $sale]);
     }
 
+    /** Ticket 80 mm imprimable (auto-impression thermique). */
+    public function receipt(Sale $sale): View
+    {
+        $sale->load(['items.product', 'user']);
+
+        return view('sales.receipt', [
+            'sale' => $sale,
+            'order' => \App\Models\Order::where('sale_id', $sale->id)->first(),
+        ]);
+    }
+
     public function store(StoreSaleRequest $request): RedirectResponse
     {
         $data = $request->validated();
@@ -76,6 +87,7 @@ class SaleController extends Controller
 
         return redirect()
             ->route('sales.create')
-            ->with('status', "Vente {$sale->sale_number} enregistrée — total ".number_format((float) $sale->total, 0, ',', ' ').' MRU.');
+            ->with('status', "Vente {$sale->sale_number} enregistrée — total ".number_format((float) $sale->total, 0, ',', ' ').' MRU.')
+            ->with('printSaleId', $sale->id);
     }
 }

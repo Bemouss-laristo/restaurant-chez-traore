@@ -126,4 +126,6 @@
             setTimeout(function () { location.reload(); }, 25000);
         })();
     </script>
+
+    @include('partials.auto-print')
 </x-app-layout>

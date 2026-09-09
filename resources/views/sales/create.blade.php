@@ -145,4 +145,6 @@
             }
         </script>
     </div>
+
+    @include('partials.auto-print')
 </x-app-layout>

@@ -9,4 +9,5 @@
     <a href="{{ route('reports.weekly') }}" class="{{ $tab(request()->routeIs('reports.weekly')) }}">Hebdomadaire</a>
     <a href="{{ route('reports.monthly') }}" class="{{ $tab(request()->routeIs('reports.monthly')) }}">Mensuel</a>
     <a href="{{ route('reports.stock') }}" class="{{ $tab(request()->routeIs('reports.stock')) }}">Contrôle stock</a>
+    <a href="{{ route('reconciliation.index') }}" class="{{ $tab(request()->routeIs('reconciliation.*')) }}">Réconciliation</a>
 </div>
