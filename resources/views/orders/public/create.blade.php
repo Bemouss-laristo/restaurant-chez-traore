@@ -138,9 +138,9 @@
                     },
                     add(p) {
                         const line = this.cart.find(l => l.id === p.id);
-                        if (line) { line.qty++; } else { this.cart.push({ id: p.id, name: p.name, price: p.price, qty: 1 }); }
+                        if (line) { if (line.qty < 50) line.qty++; } else { this.cart.push({ id: p.id, name: p.name, price: p.price, qty: 1 }); }
                     },
-                    inc(line) { line.qty++; },
+                    inc(line) { if (line.qty < 50) line.qty++; },
                     dec(line) { line.qty--; if (line.qty <= 0) this.cart = this.cart.filter(l => l.id !== line.id); },
                     get total() { return this.cart.reduce((s, l) => s + l.price * l.qty, 0); },
                     money(v) { return new Intl.NumberFormat('fr-FR').format(v) + ' MRU'; },

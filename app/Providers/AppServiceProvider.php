@@ -4,9 +4,12 @@ namespace App\Providers;
 
 use App\Enums\Role;
 use App\Models\User;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +31,19 @@ class AppServiceProvider extends ServiceProvider
 
         $this->defineAuthorizationGates();
         $this->registerBladeDirectives();
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * Anti-spam des commandes en ligne (par adresse IP) :
+     * 5 commandes par minute et 20 par heure au maximum.
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('orders', fn (Request $request) => [
+            Limit::perMinute(5)->by('orders-min|'.$request->ip()),
+            Limit::perHour(20)->by('orders-hour|'.$request->ip()),
+        ]);
     }
 
     /**

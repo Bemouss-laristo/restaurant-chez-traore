@@ -25,7 +25,7 @@ Route::get('/', function () {
 
 // Commande en ligne (public, sans connexion).
 Route::get('/commander', [PublicOrderController::class, 'create'])->name('order.create');
-Route::post('/commander', [PublicOrderController::class, 'store'])->name('order.store')->middleware('throttle:12,1');
+Route::post('/commander', [PublicOrderController::class, 'store'])->name('order.store')->middleware('throttle:orders');
 Route::get('/commander/merci', [PublicOrderController::class, 'thanks'])->name('order.thanks');
 
 // Photo d'un produit : publique (c'est un menu montré aux clients).

@@ -66,4 +66,42 @@ class OrderTest extends TestCase
         $this->assertNotNull($order->sale_id);
         $this->assertDatabaseHas('sales', ['id' => $order->sale_id, 'total' => 200.00]);
     }
+
+    public function test_an_order_quantity_is_capped(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->post('/commander', [
+            'customer_name' => 'Client Test',
+            'customer_phone' => '49625325',
+            'items' => [['product_id' => $product->id, 'quantity' => 9999]],
+        ])->assertSessionHasErrors('items.0.quantity');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_orders_are_rate_limited(): void
+    {
+        $product = Product::factory()->create();
+        $payload = [
+            'customer_name' => 'Client Test',
+            'customer_phone' => '49625325',
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+        ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post('/commander', $payload)->assertRedirect(route('order.thanks'));
+        }
+
+        $this->post('/commander', $payload)->assertStatus(429);
+    }
+
+    public function test_demo_accounts_are_not_seeded_in_production(): void
+    {
+        $this->app['env'] = 'production';
+
+        (new \Database\Seeders\UserSeeder())->run();
+
+        $this->assertDatabaseMissing('users', ['email' => 'admin@cheztraore.mr']);
+    }
 }

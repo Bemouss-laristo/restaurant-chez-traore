@@ -17,6 +17,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Sécurité : ces comptes (mot de passe « password ») ne doivent JAMAIS
+        // être créés ni réinitialisés sur le serveur en ligne. Un `db:seed`
+        // lancé par erreur en production écraserait les vrais mots de passe.
+        if (! app()->environment(['local', 'testing'])) {
+            $this->command?->warn('UserSeeder ignoré : comptes de démonstration réservés au local.');
+
+            return;
+        }
+
         $accounts = [
             ['Administrateur', 'admin@cheztraore.mr', Role::Admin],
             ['Gérant', 'gerant@cheztraore.mr', Role::Gerant],
