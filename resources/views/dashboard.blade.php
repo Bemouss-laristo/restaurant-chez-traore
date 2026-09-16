@@ -32,10 +32,11 @@
                 </div>
 
                 @if ($canSeeFinance)
-                    <div class="bg-white shadow sm:rounded-lg p-5">
+                    <a href="{{ route('expenses.index', ['date' => $businessDate->toDateString()]) }}" class="block bg-white shadow sm:rounded-lg p-5 hover:bg-gray-50">
                         <div class="text-sm text-gray-500">Dépenses du jour</div>
                         <div class="text-2xl font-bold text-red-600 mt-1">@mru($today['expenses'])</div>
-                    </div>
+                        <div class="text-xs text-indigo-600 mt-1">Voir le détail (caissiers inclus) →</div>
+                    </a>
 
                     <div class="bg-white shadow sm:rounded-lg p-5">
                         <div class="text-sm text-gray-500">Bénéfice du jour</div>

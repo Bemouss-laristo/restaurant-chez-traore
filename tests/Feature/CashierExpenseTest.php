@@ -96,4 +96,32 @@ class CashierExpenseTest extends TestCase
 
         $this->actingAs($cashier)->get('/caisse')->assertOk()->assertSee(route('cashier-expenses.index'));
     }
+
+    public function test_manager_and_admin_see_cashier_expenses_with_who_recorded_them(): void
+    {
+        $cashier = User::factory()->caissier()->create(['name' => 'Moussa Caisse']);
+        CashSession::factory()->create(['user_id' => $cashier->id]);
+
+        $this->actingAs($cashier)->post(route('cashier-expenses.store'), [
+            'expense_category' => 'achat_marchandises',
+            'items' => [['label' => 'Oignons', 'price' => 150]],
+        ]);
+
+        foreach ([User::factory()->gerant()->create(), User::factory()->admin()->create()] as $boss) {
+            $this->actingAs($boss)->get(route('expenses.index'))
+                ->assertOk()
+                ->assertSee('Moussa Caisse')
+                ->assertSee('Oignons — 150 MRU', false);
+
+            $this->actingAs($boss)->get(route('expenses.index', ['user_id' => $cashier->id, 'date' => \App\Support\BusinessDay::today()]))
+                ->assertOk()
+                ->assertSee('Oignons');
+
+            $this->actingAs($boss)->get(route('reports.daily'))
+                ->assertOk()
+                ->assertSee('Détail des dépenses du jour')
+                ->assertSee('Moussa Caisse')
+                ->assertSee('Oignons');
+        }
+    }
 }

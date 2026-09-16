@@ -9,6 +9,7 @@ use App\Enums\PaymentMethod;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
+use App\Models\User;
 use App\Services\CashSessionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,16 +24,28 @@ class ExpenseController extends Controller
     public function index(Request $request): View
     {
         $category = (string) $request->query('category', '');
+        $userId = $request->integer('user_id');
+        $date = (string) $request->query('date', '');
+        if ($date !== '' && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $date = '';
+        }
 
+        // Toutes les dépenses, y compris celles notées par les caissiers depuis la caisse.
         $query = Expense::query()
             ->with('user')
             ->when($category !== '', fn ($q) => $q->where('expense_category', $category))
-            ->latest('spent_at');
+            ->when($userId > 0, fn ($q) => $q->where('user_id', $userId))
+            ->when($date !== '', fn ($q) => $q->whereDate('spent_at', $date))
+            ->latest('spent_at')
+            ->latest('id');
 
         return view('expenses.index', [
             'expenses' => $query->paginate(20)->withQueryString(),
             'categories' => ExpenseCategory::options(),
             'category' => $category,
+            'employees' => User::whereIn('id', Expense::select('user_id')->distinct())->orderBy('name')->get(),
+            'userId' => $userId,
+            'date' => $date,
             'total' => (clone $query)->sum('amount'),
         ]);
     }

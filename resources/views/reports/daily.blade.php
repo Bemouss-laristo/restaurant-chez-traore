@@ -89,6 +89,40 @@
                 </div>
             </div>
 
+            {{-- Détail des dépenses du jour (y compris celles des caissiers) --}}
+            <div class="bg-white shadow sm:rounded-lg p-6">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <h3 class="font-medium text-gray-800">Détail des dépenses du jour</h3>
+                    <a href="{{ route('expenses.index', ['date' => $date->toDateString()]) }}" class="text-sm text-indigo-600 hover:underline">Gérer ces dépenses →</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-500">
+                                <th class="px-3 py-2">Heure</th>
+                                <th class="px-3 py-2">Saisie par</th>
+                                <th class="px-3 py-2">Catégorie</th>
+                                <th class="px-3 py-2">Articles / description</th>
+                                <th class="px-3 py-2 text-right">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($report['expensesList'] as $expense)
+                                <tr>
+                                    <td class="px-3 py-2 text-gray-600">{{ $expense->created_at->format('H:i') }}</td>
+                                    <td class="px-3 py-2">{{ $expense->user->name ?? '—' }} <span class="text-xs text-gray-400">{{ $expense->user?->role->label() }}</span></td>
+                                    <td class="px-3 py-2">{{ $expense->expense_category->label() }}</td>
+                                    <td class="px-3 py-2 text-gray-700">{!! $expense->description ? nl2br(e($expense->description)) : '—' !!}</td>
+                                    <td class="px-3 py-2 text-right font-medium">@mru($expense->amount)</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="px-3 py-4 text-center text-gray-500">Aucune dépense ce jour.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             @include('reports._cancelled')
         </div>
     </div>

@@ -48,6 +48,7 @@ final class ReportService
             'topProducts' => $this->productsSoldBetween($start, $end, 5),
             'productsSold' => $this->productsSoldBetween($start, $end),
             'cancelled' => $this->cancelledBetween($start, $end),
+            'expensesList' => Expense::with('user')->whereDate('spent_at', $d)->orderBy('created_at')->get(),
         ];
     }
 
