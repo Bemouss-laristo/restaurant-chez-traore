@@ -3,8 +3,8 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Vente {{ $sale->sale_number }}</h2>
             <div class="flex items-center gap-4">
-                <a href="{{ route('sales.receipt', $sale) }}" target="_blank"
-                   class="text-sm font-semibold px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">🖨️ Imprimer le ticket</a>
+                <button type="button" onclick="printTicket('{{ route('sales.receipt', $sale) }}')"
+                   class="text-sm font-semibold px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">🖨️ Imprimer le ticket</button>
                 <a href="{{ route('sales.index') }}" class="text-sm text-indigo-600 hover:underline">← Retour à l'historique</a>
             </div>
         </div>
@@ -116,4 +116,5 @@
             @endif
         </div>
     </div>
+    @include('partials.print-ticket')
 </x-app-layout>

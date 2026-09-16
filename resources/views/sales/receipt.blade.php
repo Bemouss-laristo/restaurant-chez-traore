@@ -114,7 +114,7 @@
 
   <div class="screen-bar">
     <button class="btn-print" onclick="window.print()">🖨️ Imprimer (client + cuisine)</button>
-    <button class="btn-close" onclick="window.close()">Fermer</button>
+    <button class="btn-close" onclick="history.length > 1 ? history.back() : window.close()">Retour</button>
   </div>
 
   <script>

@@ -49,7 +49,7 @@
                                 <tr>
                                     <td class="px-4 py-3 text-gray-600">{{ $expense->spent_at->format('d/m/Y') }}</td>
                                     <td class="px-4 py-3">{{ $expense->expense_category->label() }}</td>
-                                    <td class="px-4 py-3 text-gray-600">{{ $expense->description ?? '—' }}</td>
+                                    <td class="px-4 py-3 text-gray-600">{!! $expense->description ? nl2br(e($expense->description)) : '—' !!}</td>
                                     <td class="px-4 py-3">{{ $expense->payment_method->label() }}</td>
                                     <td class="px-4 py-3 text-right font-medium">@mru($expense->amount)</td>
                                     <td class="px-4 py-3">

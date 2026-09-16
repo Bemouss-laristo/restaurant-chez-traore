@@ -47,6 +47,7 @@ final class ReportService
             // Top 5 pour l'aperçu, et la liste COMPLÈTE de tout ce qui a été vendu.
             'topProducts' => $this->productsSoldBetween($start, $end, 5),
             'productsSold' => $this->productsSoldBetween($start, $end),
+            'cancelled' => $this->cancelledBetween($start, $end),
         ];
     }
 
@@ -83,6 +84,10 @@ final class ReportService
                 'expenses' => $rows->sum('expenses'),
                 'profit' => $rows->sum('profit'),
             ],
+            'cancelled' => $this->cancelledBetween(
+                BusinessDay::window($start->toDateString())[0],
+                BusinessDay::window($start->copy()->addDays(6)->toDateString())[1],
+            ),
             'best' => $withSales->sortByDesc('sales')->first(),
             'worst' => $withSales->sortBy('sales')->first(),
         ];
@@ -127,6 +132,7 @@ final class ReportService
                 ->groupBy('expense_category')
                 ->pluck('total', 'expense_category'),
             'topProducts' => $this->productsSoldBetween($rangeStart, $rangeEnd, 5),
+            'cancelled' => $this->cancelledBetween($rangeStart, $rangeEnd),
         ];
     }
 
@@ -180,5 +186,32 @@ final class ReportService
         }
 
         return $query->get();
+    }
+
+    /**
+     * Ventes annulées sur la période (rattachées au moment de la vente) :
+     * nombre, montant retiré et détail avec le motif, pour le gérant et l'admin.
+     *
+     * @return array{count:int, total:float, rows:Collection}
+     */
+    private function cancelledBetween(Carbon $start, Carbon $end): array
+    {
+        $sales = Sale::query()
+            ->whereNotNull('cancelled_at')
+            ->whereBetween('sold_at', [$start, $end])
+            ->with(['user', 'cancelledBy'])
+            ->orderBy('sold_at')
+            ->get();
+
+        $orders = \App\Models\Order::whereIn('sale_id', $sales->pluck('id'))->get()->keyBy('sale_id');
+
+        return [
+            'count' => $sales->count(),
+            'total' => (float) $sales->sum('total'),
+            'rows' => $sales->map(fn (Sale $sale) => [
+                'sale' => $sale,
+                'customer' => $orders[$sale->id]->customer_name ?? null,
+            ]),
+        ];
     }
 }

@@ -62,12 +62,19 @@ class CashierExpenseController extends Controller
 
         $data = $request->validated();
 
+        // Le total est calculé côté serveur à partir des lignes (jamais confié au navigateur).
+        $items = collect($data['items']);
+        $amount = round((float) $items->sum(fn ($row) => (float) $row['price']), 2);
+        $description = $items
+            ->map(fn ($row) => '• '.$row['label'].' — '.number_format((float) $row['price'], 0, ',', ' ').' MRU')
+            ->implode("\n");
+
         Expense::create([
             'user_id' => $user->id,
             'cash_session_id' => $session->id,
             'expense_category' => $data['expense_category'],
-            'amount' => $data['amount'],
-            'description' => $data['description'],
+            'amount' => $amount,
+            'description' => $description,
             'payment_method' => PaymentMethod::Especes,
             // Datée sur la journée commerciale (une dépense à 1h compte pour la soirée),
             // l'heure réelle reste disponible dans created_at.
@@ -76,6 +83,6 @@ class CashierExpenseController extends Controller
 
         return redirect()
             ->route('cashier-expenses.index')
-            ->with('status', 'Dépense enregistrée et retirée de la caisse.');
+            ->with('status', 'Dépense de '.number_format($amount, 0, ',', ' ').' MRU enregistrée et retirée de la caisse.');
     }
 }

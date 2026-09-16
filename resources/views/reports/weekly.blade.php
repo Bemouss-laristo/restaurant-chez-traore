@@ -49,6 +49,8 @@
                 <h3 class="font-medium text-gray-800 mb-4">Évolution de la semaine</h3>
                 <div style="height:320px"><canvas id="weekChart"></canvas></div>
             </div>
+
+            @include('reports._cancelled')
         </div>
     </div>
 

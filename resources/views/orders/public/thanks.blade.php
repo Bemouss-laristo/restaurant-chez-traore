@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body class="font-sans antialiased bg-stone-900 text-stone-100">
     <div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
@@ -27,7 +28,9 @@
             <a href="/" class="px-6 py-3 rounded-md border border-stone-600 text-stone-200 hover:bg-stone-800">Accueil</a>
         </div>
 
-        <p class="mt-8 text-stone-500 text-sm">Chez Traoré · 49 62 53 25</p>
+        <p class="mt-8 text-stone-500 text-sm">Chez Traoré ·
+            <a href="https://wa.me/{{ config('restaurant.phone_international') }}" target="_blank" rel="noopener" class="hover:text-amber-400"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp {{ config('restaurant.phone_display') }}</a>
+        </p>
     </div>
 </body>
 </html>

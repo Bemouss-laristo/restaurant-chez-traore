@@ -44,6 +44,8 @@
                                     <td class="px-4 py-3">{{ $sale->payment_method->label() }}</td>
                                     <td class="px-4 py-3 text-right font-medium {{ $sale->isCancelled() ? 'text-gray-400' : '' }}">@mru($sale->total)</td>
                                     <td class="px-4 py-3 text-right">
+                                        <button type="button" onclick="printTicket('{{ route('sales.receipt', $sale) }}')"
+                                            class="px-2 text-gray-600 hover:underline" title="Réimprimer le ticket">🖨️</button>
                                         <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">
                                             {{ ! $sale->isCancelled() && $sale->canBeCancelledBy(auth()->user()) ? 'Voir / Annuler' : 'Voir' }}
                                         </a>
@@ -59,4 +61,5 @@
             </div>
         </div>
     </div>
+    @include('partials.print-ticket')
 </x-app-layout>

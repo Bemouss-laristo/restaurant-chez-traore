@@ -30,14 +30,13 @@
                     Pour l'argent pris dans la caisse (espèces). Le montant est retiré de la caisse théorique.
                 </p>
 
-                <form method="POST" action="{{ route('cashier-expenses.store') }}" class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                @php
+                    $oldItems = old('items');
+                    $initialItems = is_array($oldItems) && count($oldItems) ? array_values($oldItems) : [['label' => '', 'price' => '']];
+                @endphp
+                <form method="POST" action="{{ route('cashier-expenses.store') }}" class="space-y-4"
+                    x-data="expenseList(@js($initialItems))">
                     @csrf
-                    <div>
-                        <x-input-label for="amount" value="Montant (MRU)" />
-                        <x-text-input id="amount" name="amount" type="number" step="1" min="1" inputmode="numeric"
-                            class="mt-1 block w-full" :value="old('amount')" required autofocus />
-                        <x-input-error :messages="$errors->get('amount')" class="mt-2" />
-                    </div>
                     <div>
                         <x-input-label for="expense_category" value="Catégorie" />
                         <select id="expense_category" name="expense_category"
@@ -48,19 +47,67 @@
                         </select>
                         <x-input-error :messages="$errors->get('expense_category')" class="mt-2" />
                     </div>
-                    <div class="sm:col-span-2">
-                        <x-input-label for="description" value="À quoi a servi l'argent ?" />
-                        <x-text-input id="description" name="description" type="text" class="mt-1 block w-full"
-                            :value="old('description')" placeholder="Ex : pain, sachets, taxi livraison…" required maxlength="255" />
-                        <x-input-error :messages="$errors->get('description')" class="mt-2" />
+
+                    <div>
+                        <x-input-label value="Articles achetés" />
+                        <p class="text-xs text-gray-500">Une ligne par article. Appuie sur Entrée dans le prix pour passer à la ligne suivante.</p>
+
+                        <div class="mt-2 space-y-2">
+                            <template x-for="(row, idx) in rows" :key="row.key">
+                                <div class="flex items-center gap-2">
+                                    <input type="text" :name="`items[${idx}][label]`" x-model="row.label"
+                                        placeholder="Article (ex : pain)" maxlength="100"
+                                        class="flex-1 min-w-0 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                    <input type="number" :name="`items[${idx}][price]`" x-model="row.price"
+                                        placeholder="Prix" min="1" step="1" inputmode="numeric"
+                                        x-on:keydown.enter.prevent="addRow()"
+                                        class="w-28 text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                    <button type="button" x-on:click="removeRow(idx)" title="Supprimer la ligne"
+                                        class="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">×</button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-indigo-600 hover:underline">+ Ajouter un article</button>
+
+                        @if ($errors->has('items') || $errors->has('items.*'))
+                            <p class="mt-2 text-sm text-red-600">{{ $errors->first('items') ?: collect($errors->get('items.*'))->flatten()->first() }}</p>
+                        @endif
                     </div>
-                    <div class="sm:col-span-2">
-                        <button type="submit" @disabled($session === null)
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-3">
+                        <div class="text-lg">Total : <span class="font-bold text-red-700" x-text="money(total)"></span></div>
+                        <button type="submit" @disabled($session === null) x-bind:disabled="{{ $session === null ? 'true' : 'false' }} || total <= 0"
                             class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
                             Enregistrer la dépense
                         </button>
                     </div>
                 </form>
+
+                <script>
+                    function expenseList(initial) {
+                        let next = 0;
+                        const make = (r) => ({ key: next++, label: r.label ?? '', price: r.price ?? '' });
+                        return {
+                            rows: initial.map(make),
+                            addRow() {
+                                this.rows.push(make({}));
+                                this.$nextTick(() => {
+                                    const inputs = this.$el.querySelectorAll('input[type=text]');
+                                    inputs[inputs.length - 1]?.focus();
+                                });
+                            },
+                            removeRow(idx) {
+                                this.rows.splice(idx, 1);
+                                if (this.rows.length === 0) this.rows.push(make({}));
+                            },
+                            get total() {
+                                return this.rows.reduce((s, r) => s + (parseFloat(r.price) || 0), 0);
+                            },
+                            money(v) { return new Intl.NumberFormat('fr-FR').format(v) + ' MRU'; },
+                        };
+                    }
+                </script>
             </div>
 
             {{-- Liste du jour --}}
@@ -81,7 +128,7 @@
                             <tr class="text-left text-gray-500">
                                 <th class="px-3 py-2">Heure</th>
                                 <th class="px-3 py-2">Catégorie</th>
-                                <th class="px-3 py-2">Description</th>
+                                <th class="px-3 py-2">Articles</th>
                                 <th class="px-3 py-2 text-right">Montant</th>
                             </tr>
                         </thead>
@@ -90,7 +137,7 @@
                                 <tr>
                                     <td class="px-3 py-2 text-gray-600">{{ $expense->created_at->format('H:i') }}</td>
                                     <td class="px-3 py-2">{{ $expense->expense_category->label() }}</td>
-                                    <td class="px-3 py-2 text-gray-700">{{ $expense->description }}</td>
+                                    <td class="px-3 py-2 text-gray-700">{!! nl2br(e($expense->description)) !!}</td>
                                     <td class="px-3 py-2 text-right font-medium">@mru($expense->amount)</td>
                                 </tr>
                             @empty

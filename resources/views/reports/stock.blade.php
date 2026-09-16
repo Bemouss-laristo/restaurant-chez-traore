@@ -11,7 +11,7 @@
                 <label class="text-sm text-gray-600">Date :</label>
                 <input type="date" name="date" value="{{ $date }}" class="border-gray-300 rounded-md shadow-sm" />
                 <button class="px-4 py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Afficher</button>
-                <span class="text-xs text-gray-500">Journée commerciale : de 19h jusqu'au lendemain 5h.</span>
+                <span class="text-xs text-gray-500">Ouvert de 19h à 2h. Les mouvements jusqu'à 5h du matin comptent pour la soirée.</span>
             </form>
 
             <div class="bg-white shadow sm:rounded-lg p-6">

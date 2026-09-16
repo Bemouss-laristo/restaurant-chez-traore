@@ -149,6 +149,17 @@ class SaleCancellationTest extends TestCase
         $this->assertEquals(1, $daily['orders']);
         $this->assertEquals(2, (int) $daily['productsSold']->sum('qty'));
 
+        $this->assertEquals(1, $daily['cancelled']['count']);
+        $this->assertEquals(2000.0, $daily['cancelled']['total']);
+
+        $manager = User::factory()->gerant()->create();
+        $this->actingAs($manager)->get(route('reports.daily'))
+            ->assertOk()
+            ->assertSee('1 annulée(s)')
+            ->assertSee('Client parti')
+            ->assertSee($cancelled->sale_number);
+        $this->actingAs($manager)->get(route('reports.weekly'))->assertOk()->assertSee('Client parti');
+
         $stats = app(DashboardService::class)->todayStats($cashier);
         $this->assertEquals(600.0, $stats['sales']);
         $this->assertEquals(1, $stats['orders']);
@@ -194,7 +205,11 @@ class SaleCancellationTest extends TestCase
         $cashier = User::factory()->caissier()->create();
         $sale = $this->sellOne($cashier, null);
 
-        $this->actingAs($cashier)->get(route('sales.show', $sale))->assertOk()->assertSee('Annuler la vente');
+        $this->actingAs($cashier)->get(route('sales.show', $sale))
+            ->assertOk()
+            ->assertSee('Annuler la vente')
+            ->assertSee('printTicket(', false)
+            ->assertDontSee('target="_blank"', false);
         $this->actingAs($cashier)->get(route('sales.index'))->assertOk()->assertSee('Voir / Annuler');
     }
 }

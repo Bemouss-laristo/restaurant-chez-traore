@@ -57,6 +57,8 @@
                     @endforelse
                 </div>
             </div>
+
+            @include('reports._cancelled')
         </div>
     </div>
 

@@ -15,22 +15,37 @@ class StoreCashierExpenseRequest extends FormRequest
         return $this->user()?->can('record-cash-expenses') ?? false;
     }
 
+    /** Ignore les lignes laissées complètement vides dans le formulaire. */
+    protected function prepareForValidation(): void
+    {
+        $items = collect((array) $this->input('items', []))
+            ->filter(fn ($row) => is_array($row) && (trim((string) ($row['label'] ?? '')) !== '' || trim((string) ($row['price'] ?? '')) !== ''))
+            ->map(fn ($row) => ['label' => trim((string) ($row['label'] ?? '')), 'price' => $row['price'] ?? null])
+            ->values()
+            ->all();
+
+        $this->merge(['items' => $items]);
+    }
+
     public function rules(): array
     {
         return [
             'expense_category' => ['required', Rule::enum(ExpenseCategory::class)],
-            'amount' => ['required', 'numeric', 'gt:0', 'max:1000000'],
-            // Obligatoire : c'est la ligne du « cahier » (ex : « pain pour les sandwichs »).
-            'description' => ['required', 'string', 'min:2', 'max:255'],
+            // Le « cahier » : une ligne par article acheté, avec son prix.
+            'items' => ['required', 'array', 'min:1', 'max:50'],
+            'items.*.label' => ['required', 'string', 'min:2', 'max:100'],
+            'items.*.price' => ['required', 'numeric', 'gt:0', 'max:1000000'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'amount.required' => 'Indique le montant.',
-            'amount.gt' => 'Le montant doit être supérieur à 0.',
-            'description.required' => "Écris à quoi a servi l'argent.",
+            'items.required' => 'Ajoute au moins un article acheté avec son prix.',
+            'items.min' => 'Ajoute au moins un article acheté avec son prix.',
+            'items.*.label.required' => "Écris le nom de l'article.",
+            'items.*.price.required' => "Indique le prix de l'article.",
+            'items.*.price.gt' => 'Le prix doit être supérieur à 0.',
         ];
     }
 }

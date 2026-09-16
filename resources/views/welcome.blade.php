@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- Icônes de marque (WhatsApp) fournies par la bibliothèque Font Awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body class="font-sans antialiased bg-stone-100 text-gray-900">
 
@@ -69,7 +71,6 @@
                     class="inline-block px-8 py-3 rounded-md bg-stone-900 text-white font-semibold hover:bg-stone-800 transition">
                     Voir tout le menu & commander
                 </a>
-            </div>
         </div>
     </section>
 
@@ -79,26 +80,37 @@
             <div>
                 <div class="text-3xl mb-2">🕖</div>
                 <div class="font-medium text-gray-900">Horaires</div>
-                <div class="text-gray-500 text-sm mt-1">Tous les soirs, à partir de 19h</div>
+                <div class="text-gray-500 text-sm mt-1">{{ config('restaurant.opening_hours') }}</div>
             </div>
             <div>
                 <div class="text-3xl mb-2">💳</div>
                 <div class="font-medium text-gray-900">Paiement au retrait</div>
                 <div class="text-gray-500 text-sm mt-1">Espèces · Bankily · Masrivi · Sedad</div>
             </div>
-            <div>
-                <div class="text-3xl mb-2">📞</div>
-                <div class="font-medium text-gray-900">Nous joindre</div>
-                <div class="text-gray-500 text-sm mt-1">49 62 53 25 · Nouakchott</div>
-            </div>
+            {{-- WhatsApp : toute la carte est cliquable. --}}
+            <a href="https://wa.me/{{ config('restaurant.phone_international') }}?text={{ rawurlencode('Bonjour Chez Traoré, ') }}"
+                target="_blank" rel="noopener" class="block rounded-md p-2 hover:bg-gray-50">
+                <div class="mb-2">
+                    <i class="fa-brands fa-whatsapp" style="font-size:42px;color:#25D366;" aria-hidden="true"></i>
+                </div>
+                <div class="font-medium text-gray-900">WhatsApp</div>
+                <div class="text-gray-500 text-sm mt-1">{{ config('restaurant.phone_display') }}</div>
+            </a>
         </div>
     </section>
 
     {{-- Pied de page --}}
     <footer class="bg-stone-900 text-stone-400">
         <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-            <div>© {{ date('Y') }} Chez Traoré · Nouakchott · 49 62 53 25</div>
+            <div>© {{ date('Y') }} Chez Traoré · Nouakchott ·
+                <a href="https://wa.me/{{ config('restaurant.phone_international') }}" target="_blank" rel="noopener" class="hover:text-amber-400"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp {{ config('restaurant.phone_display') }}</a>
+            </div>
             <a href="{{ auth()->check() ? route('dashboard') : route('login') }}" class="text-stone-500 hover:text-amber-400">Espace équipe</a>
+        </div>
+        <div class="border-t border-stone-600">
+            <div class="max-w-6xl mx-auto px-4 py-3 text-center text-xs text-stone-500">
+                Développé par <span class="text-amber-400 font-semibold">Bemouss</span>
+            </div>
         </div>
     </footer>
 </body>

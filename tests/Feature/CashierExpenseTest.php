@@ -24,8 +24,11 @@ class CashierExpenseTest extends TestCase
         $this->actingAs($cashier)
             ->post(route('cashier-expenses.store'), [
                 'expense_category' => 'achat_marchandises',
-                'amount' => 300,
-                'description' => 'Pain',
+                'items' => [
+                    ['label' => 'Pain', 'price' => 200],
+                    ['label' => 'Sachets', 'price' => 100],
+                    ['label' => '', 'price' => ''], // ligne vide ignorée
+                ],
             ])
             ->assertRedirect(route('cashier-expenses.index'));
 
@@ -33,12 +36,15 @@ class CashierExpenseTest extends TestCase
         $this->assertEquals($session->id, $expense->cash_session_id);
         $this->assertEquals($cashier->id, $expense->user_id);
         $this->assertEquals(PaymentMethod::Especes, $expense->payment_method);
+        $this->assertEquals(300.0, (float) $expense->amount);
+        $this->assertStringContainsString("Pain — 200 MRU", $expense->description);
+        $this->assertStringContainsString("Sachets — 100 MRU", $expense->description);
         $this->assertEquals(4700.0, app(CashSessionService::class)->expectedCash($session));
 
         $this->actingAs($cashier)
             ->get(route('cashier-expenses.index'))
             ->assertOk()
-            ->assertSee('Pain');
+            ->assertSee('Pain — 200 MRU<br', false);
     }
 
     public function test_an_open_cash_session_is_required(): void
@@ -48,22 +54,27 @@ class CashierExpenseTest extends TestCase
         $this->actingAs($cashier)
             ->post(route('cashier-expenses.store'), [
                 'expense_category' => 'divers',
-                'amount' => 100,
-                'description' => 'Sachets',
+                'items' => [['label' => 'Sachets', 'price' => 100]],
             ])
             ->assertSessionHas('error');
 
         $this->assertDatabaseCount('expenses', 0);
     }
 
-    public function test_description_and_positive_amount_are_required(): void
+    public function test_items_with_a_name_and_positive_price_are_required(): void
     {
         $cashier = User::factory()->caissier()->create();
         CashSession::factory()->create(['user_id' => $cashier->id]);
 
         $this->actingAs($cashier)
-            ->post(route('cashier-expenses.store'), ['expense_category' => 'divers', 'amount' => 0, 'description' => ''])
-            ->assertSessionHasErrors(['amount', 'description']);
+            ->post(route('cashier-expenses.store'), ['expense_category' => 'divers', 'items' => [['label' => '', 'price' => '']]])
+            ->assertSessionHasErrors('items');
+
+        $this->actingAs($cashier)
+            ->post(route('cashier-expenses.store'), ['expense_category' => 'divers', 'items' => [['label' => 'Pain', 'price' => 0]]])
+            ->assertSessionHasErrors('items.0.price');
+
+        $this->assertDatabaseCount('expenses', 0);
     }
 
     public function test_cashier_only_sees_own_expenses_and_cannot_edit_them(): void

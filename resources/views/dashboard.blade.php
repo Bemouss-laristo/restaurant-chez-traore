@@ -2,7 +2,7 @@
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Tableau de bord — {{ $businessDate->format('d/m/Y') }}
-            <span class="text-sm font-normal text-gray-500">(journée de 19h à 5h)</span>
+            <span class="text-sm font-normal text-gray-500">(ouvert de 19h à 2h — ventes comptées jusqu'à 5h)</span>
         </h2>
     </x-slot>
 
