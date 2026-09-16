@@ -25,8 +25,8 @@ final class DashboardService
         $date = BusinessDay::today();
         [$start, $end] = BusinessDay::window($date);
 
-        $sales = (float) Sale::whereBetween('sold_at', [$start, $end])->sum('total');
-        $orders = Sale::whereBetween('sold_at', [$start, $end])->count();
+        $sales = (float) Sale::valid()->whereBetween('sold_at', [$start, $end])->sum('total');
+        $orders = Sale::valid()->whereBetween('sold_at', [$start, $end])->count();
         // Les dépenses sont datées à la main : on les rattache par date commerciale directe.
         $expenses = (float) Expense::whereDate('spent_at', $date)->sum('amount');
 
@@ -49,6 +49,7 @@ final class DashboardService
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
             ->where('sales.sold_at', '>=', now()->subDays($days))
+            ->whereNull('sales.cancelled_at')
             ->groupBy('products.id', 'products.name')
             ->select(
                 'products.name',

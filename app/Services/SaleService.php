@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\StockMovementReason;
 use App\Models\CashSession;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 final class SaleService
 {
@@ -70,6 +73,57 @@ final class SaleService
             }
 
             $sale->update(['subtotal' => $total, 'total' => $total]);
+
+            return $sale;
+        });
+    }
+
+    /**
+     * Annule une vente déjà encaissée (le client a annulé sa commande) :
+     *  - la vente reste en base mais est marquée annulée (qui, quand, motif) ;
+     *  - elle ne compte plus dans la caisse, le tableau de bord ni les rapports ;
+     *  - les ingrédients consommés sont remis en stock ;
+     *  - la commande en ligne liée (s'il y en a une) passe en « Annulée ».
+     */
+    public function cancel(Sale $sale, User $user, string $reason): Sale
+    {
+        return DB::transaction(function () use ($sale, $user, $reason) {
+            $sale = Sale::whereKey($sale->getKey())->lockForUpdate()->firstOrFail();
+
+            if ($sale->isCancelled()) {
+                throw new RuntimeException('Cette vente est déjà annulée.');
+            }
+
+            $movements = $sale->stockMovements()
+                ->with('stockItem')
+                ->where('reason', StockMovementReason::Sale->value)
+                ->get();
+
+            foreach ($movements as $movement) {
+                if ($movement->stockItem === null || (float) $movement->quantity <= 0) {
+                    continue;
+                }
+
+                $this->stock->addStock(
+                    $movement->stockItem,
+                    (float) $movement->quantity,
+                    StockMovementReason::SaleCancelled,
+                    $user,
+                    "Annulation de la vente {$sale->sale_number}",
+                    $sale,
+                );
+            }
+
+            $sale->update([
+                'cancelled_at' => now(),
+                'cancelled_by' => $user->id,
+                'cancellation_reason' => $reason,
+            ]);
+
+            Order::where('sale_id', $sale->id)->update([
+                'status' => OrderStatus::Annulee->value,
+                'handled_by' => $user->id,
+            ]);
 
             return $sale;
         });

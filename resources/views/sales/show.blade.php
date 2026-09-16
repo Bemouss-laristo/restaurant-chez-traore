@@ -13,6 +13,31 @@
     <div class="py-8">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
+            @if (session('status'))
+                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">{{ session('status') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">{{ session('error') }}</div>
+            @endif
+
+            @if ($sale->isCancelled())
+                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
+                    <div class="font-semibold">Vente annulée</div>
+                    <div class="text-sm mt-1">
+                        Le {{ $sale->cancelled_at->format('d/m/Y à H:i') }} par {{ $sale->cancelledBy->name ?? '—' }}
+                        — Motif : « {{ $sale->cancellation_reason }} »
+                    </div>
+                    <div class="text-xs mt-1">Cette vente ne compte plus dans la caisse ni dans les rapports.</div>
+                </div>
+            @endif
+
+            @if ($order)
+                <div class="bg-white shadow sm:rounded-lg px-6 py-4 text-sm text-gray-700">
+                    Commande en ligne <span class="font-mono">{{ $order->order_number }}</span>
+                    — {{ $order->customer_name }} ({{ $order->customer_phone }})
+                </div>
+            @endif
+
             {{-- Infos générales --}}
             <div class="bg-white shadow sm:rounded-lg p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
@@ -29,7 +54,7 @@
                 </div>
                 <div>
                     <div class="text-xs text-gray-500">Total</div>
-                    <div class="font-semibold text-indigo-600">@mru($sale->total)</div>
+                    <div class="font-semibold {{ $sale->isCancelled() ? 'text-gray-400' : 'text-indigo-600' }}">@mru($sale->total)</div>
                 </div>
             </div>
 
@@ -65,6 +90,30 @@
                     </table>
                 </div>
             </div>
+
+            {{-- Annulation --}}
+            @if ($canCancel)
+                <div class="bg-white shadow sm:rounded-lg p-6 border border-red-200">
+                    <h3 class="font-medium text-red-700 mb-1">Annuler cette vente</h3>
+                    <p class="text-sm text-gray-500 mb-4">
+                        À utiliser si le client a annulé sa commande. La vente sera retirée de la caisse et des rapports,
+                        et les ingrédients remis en stock. Le motif est obligatoire et reste visible par le gérant.
+                    </p>
+                    <form method="POST" action="{{ route('sales.cancel', $sale) }}" class="flex flex-wrap items-end gap-3"
+                        onsubmit="return confirm('Annuler définitivement la vente {{ $sale->sale_number }} ?');">
+                        @csrf
+                        <div class="flex-1 min-w-0 w-full">
+                            <x-input-label for="cancellation_reason" value="Motif de l'annulation" />
+                            <x-text-input id="cancellation_reason" name="cancellation_reason" type="text" class="mt-1 block w-full"
+                                :value="old('cancellation_reason')" placeholder="Ex : le client a annulé sa commande" required maxlength="255" />
+                            <x-input-error :messages="$errors->get('cancellation_reason')" class="mt-2" />
+                        </div>
+                        <button class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700">
+                            Annuler la vente
+                        </button>
+                    </form>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

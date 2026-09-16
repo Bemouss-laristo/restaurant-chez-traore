@@ -41,10 +41,11 @@ final class CashSessionService
         ]);
     }
 
-    /** Total des ventes en espèces rattachées à la session. */
+    /** Total des ventes en espèces (non annulées) rattachées à la session. */
     public function cashSales(CashSession $session): float
     {
         return (float) $session->sales()
+            ->whereNull('cancelled_at')
             ->where('payment_method', PaymentMethod::Especes->value)
             ->sum('total');
     }

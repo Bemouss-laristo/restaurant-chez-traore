@@ -14,6 +14,7 @@ use App\Services\SaleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use RuntimeException;
 
 class SaleController extends Controller
 {
@@ -46,7 +47,7 @@ class SaleController extends Controller
     /** Historique des ventes. */
     public function index(Request $request): View
     {
-        $sales = Sale::with('user')
+        $sales = Sale::with(['user', 'cashSession'])
             ->withCount('items')
             ->latest('sold_at')
             ->paginate(20);
@@ -55,11 +56,15 @@ class SaleController extends Controller
     }
 
     /** Détail d'une vente : produits, quantités, prix. */
-    public function show(Sale $sale): View
+    public function show(Request $request, Sale $sale): View
     {
-        $sale->load(['items.product', 'user', 'cashSession']);
+        $sale->load(['items.product', 'user', 'cashSession', 'cancelledBy']);
 
-        return view('sales.show', ['sale' => $sale]);
+        return view('sales.show', [
+            'sale' => $sale,
+            'canCancel' => $sale->canBeCancelledBy($request->user()),
+            'order' => \App\Models\Order::where('sale_id', $sale->id)->first(),
+        ]);
     }
 
     /** Ticket 80 mm imprimable (auto-impression thermique). */
@@ -89,5 +94,35 @@ class SaleController extends Controller
             ->route('sales.create')
             ->with('status', "Vente {$sale->sale_number} enregistrée — total ".number_format((float) $sale->total, 0, ',', ' ').' MRU.')
             ->with('printSaleId', $sale->id);
+    }
+
+    /**
+     * Annule une vente encaissée (le client a annulé). Motif obligatoire :
+     * l'annulation reste visible par le gérant et l'admin.
+     */
+    public function cancel(Request $request, Sale $sale): RedirectResponse
+    {
+        $data = $request->validate([
+            'cancellation_reason' => ['required', 'string', 'min:3', 'max:255'],
+        ], [
+            'cancellation_reason.required' => "Indique le motif de l'annulation.",
+            'cancellation_reason.min' => 'Le motif doit faire au moins 3 caractères.',
+        ]);
+
+        if (! $sale->canBeCancelledBy($request->user())) {
+            return back()->with('error', $sale->isCancelled()
+                ? 'Cette vente est déjà annulée.'
+                : "Tu ne peux pas annuler cette vente (autre journée ou caisse déjà clôturée). Demande au gérant.");
+        }
+
+        try {
+            $this->sales->cancel($sale, $request->user(), $data['cancellation_reason']);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()
+            ->route('sales.show', $sale)
+            ->with('status', "Vente {$sale->sale_number} annulée : elle est retirée de la caisse et des rapports, et le stock a été remis.");
     }
 }

@@ -12,6 +12,10 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow sm:rounded-lg p-6">
+                @if (session('status'))
+                    <div class="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">{{ session('status') }}</div>
+                @endif
+                <p class="mb-4 text-sm text-gray-500">Pour annuler une vente (client qui annule), ouvre-la avec « Voir / Annuler ».</p>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead>
@@ -27,17 +31,22 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($sales as $sale)
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50 {{ $sale->isCancelled() ? 'bg-red-50 text-gray-400' : '' }}">
                                     <td class="px-4 py-3 font-mono text-xs">
                                         <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">{{ $sale->sale_number }}</a>
+                                        @if ($sale->isCancelled())
+                                            <span class="ms-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">ANNULÉE</span>
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3 text-gray-600">{{ $sale->sold_at->format('d/m/Y H:i') }}</td>
                                     <td class="px-4 py-3 text-gray-600">{{ $sale->user->name }}</td>
                                     <td class="px-4 py-3 text-right text-gray-600">{{ $sale->items_count }}</td>
                                     <td class="px-4 py-3">{{ $sale->payment_method->label() }}</td>
-                                    <td class="px-4 py-3 text-right font-medium">@mru($sale->total)</td>
+                                    <td class="px-4 py-3 text-right font-medium {{ $sale->isCancelled() ? 'text-gray-400' : '' }}">@mru($sale->total)</td>
                                     <td class="px-4 py-3 text-right">
-                                        <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">Voir</a>
+                                        <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">
+                                            {{ ! $sale->isCancelled() && $sale->canBeCancelledBy(auth()->user()) ? 'Voir / Annuler' : 'Voir' }}
+                                        </a>
                                     </td>
                                 </tr>
                             @empty

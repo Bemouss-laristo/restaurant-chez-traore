@@ -74,6 +74,7 @@ class AppServiceProvider extends ServiceProvider
             'manage-products' => [Role::Gerant],
             'manage-stock'    => [Role::Gerant],
             'manage-expenses' => [Role::Gerant],
+            'record-cash-expenses' => [Role::Gerant, Role::Caissier], // cahier de dépenses de caisse
             'view-reports'    => [Role::Gerant],
             'handle-sales'    => [Role::Gerant, Role::Caissier],
             'handle-cash'     => [Role::Gerant, Role::Caissier],

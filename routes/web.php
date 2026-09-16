@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CashSessionController;
+use App\Http\Controllers\CashierExpenseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ExpenseController;
@@ -47,9 +48,14 @@ Route::middleware(['auth', 'role:admin,gerant,caissier'])->group(function () {
     Route::post('caisse/open', [CashSessionController::class, 'open'])->name('caisse.open');
     Route::post('caisse/close', [CashSessionController::class, 'close'])->name('caisse.close');
 
+    // Cahier de dépenses du caissier (petites dépenses payées depuis la caisse).
+    Route::get('caisse/depenses', [CashierExpenseController::class, 'index'])->name('cashier-expenses.index');
+    Route::post('caisse/depenses', [CashierExpenseController::class, 'store'])->name('cashier-expenses.store');
+
     Route::get('ventes', [SaleController::class, 'create'])->name('sales.create');
     Route::get('ventes/historique', [SaleController::class, 'index'])->name('sales.index');
     Route::post('ventes', [SaleController::class, 'store'])->name('sales.store');
+    Route::post('ventes/{sale}/annuler', [SaleController::class, 'cancel'])->name('sales.cancel');
     Route::get('ventes/{sale}/ticket', [SaleController::class, 'receipt'])->name('sales.receipt');
     Route::get('ventes/{sale}', [SaleController::class, 'show'])->name('sales.show');
 

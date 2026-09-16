@@ -95,6 +95,13 @@
                                 <span class="text-gray-700">{{ $order->customer_name }}</span>
                                 <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $order->status->badgeClass() }}">{{ $order->status->label() }}</span>
                                 <span class="text-gray-500">@mru($order->total)</span>
+                                @if ($order->sale_id)
+                                    <a href="{{ route('sales.show', $order->sale_id) }}" class="text-indigo-600 hover:underline text-xs">
+                                        {{ $order->status === \App\Enums\OrderStatus::Terminee ? 'Voir / Annuler' : 'Voir la vente' }}
+                                    </a>
+                                @else
+                                    <span class="w-20"></span>
+                                @endif
                             </div>
                         @endforeach
                     </div>

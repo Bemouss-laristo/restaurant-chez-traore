@@ -11,6 +11,7 @@ namespace App\Enums;
  * Sale     : consommation automatique liée à une vente (via la recette).
  * Waste    : perte, casse, péremption.
  * Manual   : ajustement manuel après inventaire.
+ * SaleCancelled : retour en stock suite à l'annulation d'une vente.
  */
 enum StockMovementReason: string
 {
@@ -18,6 +19,7 @@ enum StockMovementReason: string
     case Sale = 'sale';
     case Waste = 'waste';
     case Manual = 'manual';
+    case SaleCancelled = 'sale_cancelled';
 
     public function label(): string
     {
@@ -26,6 +28,7 @@ enum StockMovementReason: string
             self::Sale => 'Vente',
             self::Waste => 'Perte',
             self::Manual => 'Ajustement manuel',
+            self::SaleCancelled => 'Annulation de vente',
         };
     }
 }

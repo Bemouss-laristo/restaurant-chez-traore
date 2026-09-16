@@ -25,6 +25,12 @@
                         Caisse
                     </x-nav-link>
 
+                    @if (auth()->user()->isCaissier())
+                        <x-nav-link :href="route('cashier-expenses.index')" :active="request()->routeIs('cashier-expenses.*')">
+                            Dépenses
+                        </x-nav-link>
+                    @endif
+
                     <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                         Commandes
                         @if ($pendingOrders > 0)
@@ -115,6 +121,12 @@
             <x-responsive-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
                 Caisse
             </x-responsive-nav-link>
+
+            @if (auth()->user()->isCaissier())
+                <x-responsive-nav-link :href="route('cashier-expenses.index')" :active="request()->routeIs('cashier-expenses.*')">
+                    Dépenses
+                </x-responsive-nav-link>
+            @endif
 
             <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                 Commandes @if ($pendingOrders > 0) ({{ $pendingOrders }}) @endif

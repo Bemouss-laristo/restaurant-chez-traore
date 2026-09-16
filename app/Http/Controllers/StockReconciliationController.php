@@ -85,6 +85,12 @@ class StockReconciliationController extends Controller
                 ->where('reason', StockMovementReason::Sale->value)
                 ->whereBetween('created_at', [$start, $end])
                 ->sum('quantity');
+            // Les ventes annulées ont remis leurs ingrédients en stock.
+            $saleOut = max(0, $saleOut - (float) $item->movements()
+                ->where('type', StockMovementType::In->value)
+                ->where('reason', StockMovementReason::SaleCancelled->value)
+                ->whereBetween('created_at', [$start, $end])
+                ->sum('quantity'));
 
             $purchaseIn = (float) $item->movements()
                 ->where('type', StockMovementType::In->value)

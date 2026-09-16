@@ -52,6 +52,7 @@
                         <div class="bg-red-50 rounded-md p-4">
                             <div class="text-xs text-gray-500">Dépenses espèces</div>
                             <div class="text-lg font-semibold text-red-700">−@mru($cashExpenses)</div>
+                            <a href="{{ route('cashier-expenses.index') }}" class="text-xs text-indigo-600 hover:underline">+ Noter une dépense</a>
                         </div>
                         <div class="bg-indigo-50 rounded-md p-4">
                             <div class="text-xs text-gray-500">Caisse théorique</div>

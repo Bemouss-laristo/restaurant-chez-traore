@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Tous les calculs suivent la « journée commerciale » (19h → 5h) :
  *  - les VENTES sont rattachées par leur horaire réel (fenêtre décalée) ;
- *  - les DÉPENSES sont datées à la main, donc rattachées par leur date directe.
+ *  - les DÉPENSES sont datées à la main, donc rattachées par leur date directe ;
+ *  - les ventes ANNULÉES ne comptent jamais.
  */
 final class ReportService
 {
@@ -26,8 +27,8 @@ final class ReportService
         $d = $date->toDateString();
         [$start, $end] = BusinessDay::window($d);
 
-        $salesTotal = (float) Sale::whereBetween('sold_at', [$start, $end])->sum('total');
-        $orders = Sale::whereBetween('sold_at', [$start, $end])->count();
+        $salesTotal = (float) Sale::valid()->whereBetween('sold_at', [$start, $end])->sum('total');
+        $orders = Sale::valid()->whereBetween('sold_at', [$start, $end])->count();
         $expensesTotal = (float) Expense::whereDate('spent_at', $d)->sum('amount');
 
         return [
@@ -35,7 +36,7 @@ final class ReportService
             'orders' => $orders,
             'expensesTotal' => $expensesTotal,
             'profit' => $salesTotal - $expensesTotal,
-            'byPayment' => Sale::whereBetween('sold_at', [$start, $end])
+            'byPayment' => Sale::valid()->whereBetween('sold_at', [$start, $end])
                 ->selectRaw('payment_method, SUM(total) as total')
                 ->groupBy('payment_method')
                 ->pluck('total', 'payment_method'),
@@ -59,7 +60,7 @@ final class ReportService
             $d = $day->toDateString();
             [$ws, $we] = BusinessDay::window($d);
 
-            $sales = (float) Sale::whereBetween('sold_at', [$ws, $we])->sum('total');
+            $sales = (float) Sale::valid()->whereBetween('sold_at', [$ws, $we])->sum('total');
             $expenses = (float) Expense::whereDate('spent_at', $d)->sum('amount');
 
             return [
@@ -99,7 +100,7 @@ final class ReportService
 
         // Ventes agrégées par journée commerciale (date décalée de l'heure de reset).
         // $hour vient de la config (entier de confiance), on peut l'insérer directement.
-        $salesByDay = Sale::whereBetween('sold_at', [$rangeStart, $rangeEnd])
+        $salesByDay = Sale::valid()->whereBetween('sold_at', [$rangeStart, $rangeEnd])
             ->selectRaw("DATE(sold_at - INTERVAL {$hour} HOUR) as d, SUM(total) as total")
             ->groupBy('d')
             ->pluck('total', 'd');
@@ -112,7 +113,7 @@ final class ReportService
 
         $monthStart = $first->copy()->startOfDay();
         $monthEnd = $last->copy()->endOfDay();
-        $salesTotal = (float) Sale::whereBetween('sold_at', [$rangeStart, $rangeEnd])->sum('total');
+        $salesTotal = (float) Sale::valid()->whereBetween('sold_at', [$rangeStart, $rangeEnd])->sum('total');
         $expensesTotal = (float) Expense::whereBetween('spent_at', [$monthStart, $monthEnd])->sum('amount');
 
         return [
@@ -140,12 +141,19 @@ final class ReportService
         return StockItem::orderBy('name')->get()->map(function (StockItem $item) use ($start, $end) {
             $in = (float) $item->movements()
                 ->where('type', 'in')
+                ->where('reason', '!=', 'sale_cancelled')
                 ->whereBetween('created_at', [$start, $end])
                 ->sum('quantity');
-            $out = (float) $item->movements()
+            // Un retour en stock après annulation de vente annule la sortie correspondante.
+            $returned = (float) $item->movements()
+                ->where('type', 'in')
+                ->where('reason', 'sale_cancelled')
+                ->whereBetween('created_at', [$start, $end])
+                ->sum('quantity');
+            $out = max(0, (float) $item->movements()
                 ->where('type', 'out')
                 ->whereBetween('created_at', [$start, $end])
-                ->sum('quantity');
+                ->sum('quantity') - $returned);
 
             return ['item' => $item, 'in' => $in, 'out' => $out];
         });
@@ -158,6 +166,7 @@ final class ReportService
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
             ->whereBetween('sales.sold_at', [$start, $end])
+            ->whereNull('sales.cancelled_at')
             ->groupBy('products.id', 'products.name')
             ->select(
                 'products.name',
