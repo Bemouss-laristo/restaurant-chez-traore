@@ -16,14 +16,13 @@
     font-size: 12.5px;
     line-height: 1.45;
   }
-  /* Un exemplaire = un ticket. Saut de page entre les deux pour que
-     l'imprimante coupe le papier entre le ticket CLIENT et le ticket CUISINE. */
+  /* Un seul exemplaire par impression : le ticket CUISINE part dans une
+     impression séparée, juste après le ticket CLIENT. */
   .ticket {
     width: 72mm;
     margin: 0 auto;
     padding: 4mm 2mm 6mm;
   }
-  .ticket + .ticket { break-before: page; page-break-before: always; }
   .center { text-align: center; }
   .copy {
     text-align: center; font-size: 15px; font-weight: 700; letter-spacing: 2px;
@@ -58,7 +57,6 @@
 </style>
 </head>
 <body>
-@foreach (['CLIENT', 'CUISINE'] as $copy)
   <div class="ticket">
     <div class="copy">*** {{ $copy }} ***</div>
 
@@ -110,22 +108,24 @@
       Commandez en ligne : cheztraore.com
     </div>
   </div>
-@endforeach
 
   <div class="screen-bar">
-    <button class="btn-print" onclick="window.print()">🖨️ Imprimer (client + cuisine)</button>
+    <button class="btn-print" onclick="location.href='{{ route('sales.receipt', ['sale' => $sale, 'copy' => 'client']) }}'">🖨️ Client</button>
+    <button class="btn-print" onclick="location.href='{{ route('sales.receipt', ['sale' => $sale, 'copy' => 'cuisine']) }}'">🖨️ Cuisine</button>
     <button class="btn-close" onclick="history.length > 1 ? history.back() : window.close()">Retour</button>
   </div>
 
   <script>
-    // Impression automatique dès l'ouverture (dans une fenêtre ou un iframe).
-    // Les deux exemplaires partent dans la même impression.
+    // Impression automatique de CET exemplaire dès l'ouverture (fenêtre ou cadre invisible).
+    // window.print() attend la fin de l'impression : on enchaîne ensuite sur le ticket
+    // CUISINE, qui part dans une impression SÉPARÉE (donc un ticket coupé à part).
     window.addEventListener('load', function () {
-      setTimeout(function () { window.print(); }, 250);
-    });
-    // Referme la fenêtre après impression (si ouverte en pop-up).
-    window.addEventListener('afterprint', function () {
-      if (window.opener) { window.close(); }
+      setTimeout(function () {
+        window.print();
+        @if ($nextUrl)
+          setTimeout(function () { location.replace(@js($nextUrl)); }, 800);
+        @endif
+      }, 250);
     });
   </script>
 </body>

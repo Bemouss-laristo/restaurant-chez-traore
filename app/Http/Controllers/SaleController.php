@@ -68,13 +68,24 @@ class SaleController extends Controller
     }
 
     /** Ticket 80 mm imprimable (auto-impression thermique). */
-    public function receipt(Sale $sale): View
+    /**
+     * Ticket 80 mm. Deux impressions SÉPARÉES :
+     *  - sans paramètre : imprime le ticket CLIENT, puis enchaîne tout seul sur le ticket CUISINE ;
+     *  - ?copy=client ou ?copy=cuisine : réimprime un seul exemplaire.
+     */
+    public function receipt(Request $request, Sale $sale): View
     {
         $sale->load(['items.product', 'user']);
+
+        $requested = (string) $request->query('copy', '');
+        $copy = $requested === 'cuisine' ? 'CUISINE' : 'CLIENT';
 
         return view('sales.receipt', [
             'sale' => $sale,
             'order' => \App\Models\Order::where('sale_id', $sale->id)->first(),
+            'copy' => $copy,
+            // Après le ticket client, on passe au ticket cuisine (seulement dans l'enchaînement automatique).
+            'nextUrl' => $requested === '' ? route('sales.receipt', ['sale' => $sale, 'copy' => 'cuisine']) : null,
         ]);
     }
 

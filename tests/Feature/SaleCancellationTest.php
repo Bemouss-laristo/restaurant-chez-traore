@@ -194,10 +194,20 @@ class SaleCancellationTest extends TestCase
         $cashier = User::factory()->caissier()->create();
         $sale = $this->sellOne($cashier, null);
 
+        // Par défaut : ticket CLIENT seul, puis enchaînement vers le ticket CUISINE (impression séparée).
         $this->actingAs($cashier)
             ->get(route('sales.receipt', $sale))
             ->assertOk()
-            ->assertSeeInOrder(['*** CLIENT ***', $sale->sale_number, '*** CUISINE ***', $sale->sale_number]);
+            ->assertSee('*** CLIENT ***')
+            ->assertDontSee('*** CUISINE ***')
+            ->assertSee('copy=cuisine', false);
+
+        $this->actingAs($cashier)
+            ->get(route('sales.receipt', ['sale' => $sale, 'copy' => 'cuisine']))
+            ->assertOk()
+            ->assertSee('*** CUISINE ***')
+            ->assertDontSee('*** CLIENT ***')
+            ->assertDontSee('location.replace', false);
     }
 
     public function test_sale_page_shows_the_cancel_form_to_the_cashier(): void
