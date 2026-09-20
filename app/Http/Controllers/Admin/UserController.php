@@ -16,25 +16,11 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    /** Liste paginée + recherche par nom ou email. */
+    /** Liste complète : la recherche par nom, email ou rôle filtre à la frappe. */
     public function index(Request $request): View
     {
-        $search = trim((string) $request->query('search', ''));
-
-        $users = User::query()
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString();
-
         return view('admin.users.index', [
-            'users' => $users,
-            'search' => $search,
+            'users' => User::query()->orderBy('name')->get(),
         ]);
     }
 

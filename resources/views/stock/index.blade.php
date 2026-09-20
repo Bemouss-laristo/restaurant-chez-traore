@@ -9,6 +9,11 @@
         </div>
     </x-slot>
 
+    @php
+        $rows = $items->map(fn ($i) => trim($i->name.' '.($i->supplier->name ?? '').' '.$i->unit->value))->values();
+        $lows = $items->map(fn ($i) => $i->isLow())->values();
+    @endphp
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
@@ -22,20 +27,26 @@
             @if ($lowCount > 0)
                 <div class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-md">
                     ⚠ {{ $lowCount }} article(s) sous le seuil d'alerte.
-                    <a href="{{ route('stock-items.index', ['low' => 1]) }}" class="underline">Voir seulement ceux-là</a>
                 </div>
             @endif
 
-            <div class="bg-white shadow sm:rounded-lg p-6">
-                <form method="GET" action="{{ route('stock-items.index') }}" class="mb-4 flex flex-wrap gap-2 items-center">
-                    <input type="text" name="search" value="{{ $search }}" placeholder="Rechercher un article…"
+            <div class="bg-white shadow sm:rounded-lg p-6" x-data="liveSearch({
+                rows: @js($rows),
+                lows: @js($lows),
+                onlyLow: false,
+                keep(text, isLow) { return (! this.onlyLow || isLow) && this.match(text); },
+                get shown() { return this.rows.filter((row, i) => this.keep(row, this.lows[i])).length; },
+            })">
+                <div class="mb-4 flex flex-wrap gap-2 items-center">
+                    <input type="search" x-model="search" placeholder="Rechercher un article…" autocomplete="off"
                         class="border-gray-300 rounded-md shadow-sm w-full max-w-sm" />
                     <label class="flex items-center gap-2 text-sm text-gray-600">
-                        <input type="checkbox" name="low" value="1" @checked($onlyLow) class="rounded border-gray-300" />
+                        <input type="checkbox" x-model="onlyLow" class="rounded border-gray-300" />
                         Stock faible uniquement
                     </label>
-                    <button class="px-4 py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Filtrer</button>
-                </form>
+                    <span class="text-sm text-gray-500" x-show="search.trim() !== '' || onlyLow"
+                        x-text="shown + ' article(s) sur {{ $items->count() }}'"></span>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -51,8 +62,29 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($items as $item)
-                                <tr class="{{ $item->isLow() ? 'bg-red-50' : '' }}">
-                                    <td class="px-4 py-3 font-medium text-gray-900">{{ $item->name }}</td>
+                                <tr class="{{ $item->isLow() ? 'bg-red-50' : '' }}"
+                                    x-show="keep(@js($rows[$loop->index]), {{ $item->isLow() ? 'true' : 'false' }})">
+                                    <td class="px-4 py-3 font-medium text-gray-900">
+                                        {{ $item->name }}
+                                        @if ($item->is_key)
+                                            <span class="ms-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">clé</span>
+                                        @endif
+                                        @php($lastCount = $item->lastCountedAt())
+                                        <div class="text-xs {{ $lastCount ? 'text-gray-400' : 'text-amber-700' }}">
+                                            {{ $lastCount ? 'Dernier comptage : '.$lastCount->format('d/m/Y') : 'Jamais compté' }}
+                                        </div>
+                                        @if ($item->pack_label && (float) $item->pack_quantity > 0)
+                                            <div class="text-xs text-gray-400">{{ $item->pack_label }} = {{ rtrim(rtrim(number_format((float) $item->pack_quantity, 3, ',', ' '), '0'), ',') }} {{ $item->unit->value }}</div>
+                                        @endif
+                                        @if ($item->supplier)
+                                            <div class="text-xs text-gray-500">
+                                                {{ $item->supplier->name }}@if (($item->default_payment_method?->value ?? null) === 'credit') — à crédit @endif
+                                                @if ($item->hasAgreedPrice())
+                                                    — @mru($item->agreed_unit_price) le {{ $item->unit->value }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </td>
                                     <td class="px-4 py-3 text-right">{{ (float) $item->quantity }} {{ $item->unit->value }}</td>
                                     <td class="px-4 py-3 text-right text-gray-500">{{ (float) $item->alert_threshold }}</td>
                                     <td class="px-4 py-3 text-right text-gray-500">@mru($item->unit_cost)</td>
@@ -70,12 +102,19 @@
                             @empty
                                 <tr><td colspan="6" class="px-4 py-6 text-center text-gray-500">Aucun article de stock.</td></tr>
                             @endforelse
+                            @if ($items->isNotEmpty())
+                                <tr x-show="shown === 0">
+                                    <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                                        Aucun article ne correspond à cette recherche.
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
-
-                <div class="mt-4">{{ $items->links() }}</div>
             </div>
         </div>
     </div>
+
+    @include('partials.live-search')
 </x-app-layout>

@@ -58,6 +58,40 @@
                 </div>
             </div>
 
+            {{-- Tous les produits vendus du mois : ce qui rapporte vraiment --}}
+            <div class="bg-white shadow sm:rounded-lg p-6">
+                <h3 class="font-medium text-gray-800 mb-1">Tous les produits vendus ce mois</h3>
+                <p class="text-sm text-gray-500 mb-4">Classés par chiffre d'affaires. La marge tient compte du coût matière estimé de chaque recette.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-500">
+                                <th class="px-3 py-2">Produit</th>
+                                <th class="px-3 py-2 text-right">Quantité</th>
+                                <th class="px-3 py-2 text-right">Chiffre d'affaires</th>
+                                <th class="px-3 py-2 text-right">Coût matière</th>
+                                <th class="px-3 py-2 text-right">Marge</th>
+                                <th class="px-3 py-2 text-right">Marge %</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse ($report['productsSold'] as $p)
+                                <tr>
+                                    <td class="px-3 py-2 font-medium text-gray-900">{{ $p->name }}</td>
+                                    <td class="px-3 py-2 text-right">{{ (int) $p->qty }}</td>
+                                    <td class="px-3 py-2 text-right font-medium text-green-700">@mru($p->revenue)</td>
+                                    <td class="px-3 py-2 text-right text-gray-600">@mru($p->cost)</td>
+                                    <td class="px-3 py-2 text-right font-medium text-indigo-600">@mru($p->margin)</td>
+                                    <td class="px-3 py-2 text-right text-gray-500">{{ $p->revenue > 0 ? number_format($p->margin / $p->revenue * 100, 0, ',', ' ') : 0 }} %</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">Aucune vente ce mois.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             @include('reports._cancelled')
         </div>
     </div>

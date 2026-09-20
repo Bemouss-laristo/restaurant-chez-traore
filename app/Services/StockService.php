@@ -30,8 +30,9 @@ final class StockService
         ?User $user = null,
         ?string $note = null,
         ?Model $source = null,
+        ?float $unitCost = null,
     ): StockMovement {
-        return $this->apply($item, StockMovementType::In, $reason, $quantity, $user, $note, $source);
+        return $this->apply($item, StockMovementType::In, $reason, $quantity, $user, $note, $source, $unitCost);
     }
 
     /** Sortie de stock (perte, ou consommation liée à une vente). */
@@ -42,8 +43,9 @@ final class StockService
         ?User $user = null,
         ?string $note = null,
         ?Model $source = null,
+        ?float $unitCost = null,
     ): StockMovement {
-        return $this->apply($item, StockMovementType::Out, $reason, $quantity, $user, $note, $source);
+        return $this->apply($item, StockMovementType::Out, $reason, $quantity, $user, $note, $source, $unitCost);
     }
 
     /**
@@ -74,6 +76,7 @@ final class StockService
                 'type' => $type,
                 'reason' => StockMovementReason::Manual,
                 'quantity' => abs($delta),
+                'unit_cost' => (float) $item->unit_cost,
                 'note' => $note,
             ]);
         });
@@ -88,12 +91,13 @@ final class StockService
         ?User $user,
         ?string $note,
         ?Model $source,
+        ?float $unitCost = null,
     ): StockMovement {
         if ($quantity <= 0) {
             throw new InvalidArgumentException('La quantité du mouvement doit être positive.');
         }
 
-        return DB::transaction(function () use ($item, $type, $reason, $quantity, $user, $note, $source) {
+        return DB::transaction(function () use ($item, $type, $reason, $quantity, $user, $note, $source, $unitCost) {
             $item = StockItem::whereKey($item->getKey())->lockForUpdate()->firstOrFail();
 
             $newQuantity = (float) $item->quantity + ($type->sign() * $quantity);
@@ -106,6 +110,7 @@ final class StockService
                 'type' => $type,
                 'reason' => $reason,
                 'quantity' => $quantity,
+                'unit_cost' => $unitCost ?? (float) $item->unit_cost,
                 'note' => $note,
             ]);
             $movement->stockItem()->associate($item);

@@ -45,6 +45,15 @@
                         <x-nav-link :href="route('stock-items.index')" :active="request()->routeIs('stock-items.*')">
                             Stock
                         </x-nav-link>
+                        <x-nav-link :href="route('purchases.create')" :active="request()->routeIs('purchases.*')">
+                            Achats
+                        </x-nav-link>
+                        <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
+                            Fournisseurs
+                        </x-nav-link>
+                        <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                            Salaires
+                        </x-nav-link>
                         <x-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
                             Dépenses
                         </x-nav-link>
@@ -138,6 +147,15 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('stock-items.index')" :active="request()->routeIs('stock-items.*')">
                     Stock
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('purchases.create')" :active="request()->routeIs('purchases.*')">
+                    Achats
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
+                    Fournisseurs
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
+                    Salaires
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
                     Dépenses

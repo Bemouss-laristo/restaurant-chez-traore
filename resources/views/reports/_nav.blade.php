@@ -8,6 +8,11 @@
     <a href="{{ route('reports.daily') }}" class="{{ $tab(request()->routeIs('reports.daily')) }}">Journalier</a>
     <a href="{{ route('reports.weekly') }}" class="{{ $tab(request()->routeIs('reports.weekly')) }}">Hebdomadaire</a>
     <a href="{{ route('reports.monthly') }}" class="{{ $tab(request()->routeIs('reports.monthly')) }}">Mensuel</a>
+    <a href="{{ route('reports.purchases') }}" class="{{ $tab(request()->routeIs('reports.purchases')) }}">Achats</a>
+    <a href="{{ route('envelope.index') }}" class="{{ $tab(request()->routeIs('envelope.*')) }}">Enveloppe du mois</a>
+    <a href="{{ route('balances.index') }}" class="{{ $tab(request()->routeIs('balances.*')) }}">Soldes</a>
+    <a href="{{ route('reports.treasury') }}" class="{{ $tab(request()->routeIs('reports.treasury')) }}">Trésorerie</a>
+    <a href="{{ route('reports.material') }}" class="{{ $tab(request()->routeIs('reports.material')) }}">Contrôle matière</a>
     <a href="{{ route('reports.stock') }}" class="{{ $tab(request()->routeIs('reports.stock')) }}">Contrôle stock</a>
     <a href="{{ route('reconciliation.index') }}" class="{{ $tab(request()->routeIs('reconciliation.*')) }}">Réconciliation</a>
 </div>

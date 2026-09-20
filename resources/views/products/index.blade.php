@@ -9,7 +9,20 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
+    @php
+        $rows = $products->map(fn ($p) => trim($p->name.' '.($p->category->name ?? '')))->values();
+        $cats = $products->map(fn ($p) => (int) $p->product_category_id)->values();
+    @endphp
+
+    <div class="py-12" x-data="liveSearch({
+        rows: @js($rows),
+        cats: @js($cats),
+        category: '',
+        keep(text, categoryId) {
+            return (this.category === '' || String(categoryId) === String(this.category)) && this.match(text);
+        },
+        get shown() { return this.rows.filter((row, i) => this.keep(row, this.cats[i])).length; },
+    })">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
             @if (session('status'))
@@ -17,22 +30,24 @@
             @endif
 
             <div class="bg-white shadow sm:rounded-lg p-4">
-                <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap gap-2 items-center">
-                    <input type="text" name="search" value="{{ $search }}" placeholder="Rechercher un produit…"
+                <div class="flex flex-wrap gap-2 items-center">
+                    <input type="search" x-model="search" placeholder="Rechercher un produit…" autocomplete="off"
                         class="border-gray-300 rounded-md shadow-sm w-full max-w-xs" />
-                    <select name="category_id" class="border-gray-300 rounded-md shadow-sm">
+                    <select x-model="category" class="border-gray-300 rounded-md shadow-sm">
                         <option value="">Toutes les catégories</option>
                         @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @selected($categoryId === $category->id)>{{ $category->name }}</option>
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
-                    <button class="px-4 py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Filtrer</button>
-                </form>
+                    <span class="text-sm text-gray-500" x-show="search.trim() !== '' || category !== ''"
+                        x-text="shown + ' produit(s) sur {{ $products->count() }}'"></span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @forelse ($products as $product)
                     <a href="{{ route('products.edit', $product) }}"
+                        x-show="keep(@js($rows[$loop->index]), {{ (int) $product->product_category_id }})"
                         class="bg-white shadow sm:rounded-lg overflow-hidden hover:shadow-md transition group">
                         <div class="relative">
                             <img src="{{ $product->imageUrl() }}" alt="{{ $product->name }}"
@@ -49,12 +64,18 @@
                     </a>
                 @empty
                     <div class="col-span-full bg-white shadow sm:rounded-lg p-8 text-center text-gray-500">
-                        Aucun produit trouvé.
+                        Aucun produit enregistré.
                     </div>
                 @endforelse
-            </div>
 
-            <div>{{ $products->links() }}</div>
+                @if ($products->isNotEmpty())
+                    <div class="col-span-full bg-white shadow sm:rounded-lg p-8 text-center text-gray-500" x-show="shown === 0">
+                        Aucun produit ne correspond à cette recherche.
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
+
+    @include('partials.live-search')
 </x-app-layout>

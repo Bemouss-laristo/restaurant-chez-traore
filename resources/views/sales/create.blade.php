@@ -90,8 +90,8 @@
                                 <x-input-label for="payment_method" value="Mode de paiement" />
                                 <select id="payment_method" name="payment_method" x-model="paymentMethod"
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                                    @foreach (\App\Enums\PaymentMethod::cases() as $pm)
-                                        <option value="{{ $pm->value }}">{{ $pm->label() }}</option>
+                                    @foreach (\App\Enums\PaymentMethod::salesOptions() as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -123,11 +123,17 @@
                     category: '',
                     cart: [],
                     paymentMethod: 'especes',
+                    // Accents ignorés et mots dans n'importe quel ordre :
+                    // « hachee » trouve « Kebab haché », « ke po » trouve « Kebab poulet ».
+                    norm(v) {
+                        return (v ?? '').toString().toLowerCase()
+                            .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    },
                     get filteredProducts() {
-                        const s = this.search.toLowerCase();
+                        const words = this.norm(this.search).trim().split(/\s+/).filter(Boolean);
                         return this.products.filter(p =>
                             (this.category === '' || String(p.category_id) === String(this.category)) &&
-                            (s === '' || p.name.toLowerCase().includes(s))
+                            (words.length === 0 || words.every(w => this.norm(p.name).includes(w)))
                         );
                     },
                     add(p) {

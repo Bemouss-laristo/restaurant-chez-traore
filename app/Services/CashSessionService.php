@@ -58,12 +58,30 @@ final class CashSessionService
             ->sum('amount');
     }
 
-    /** Caisse théorique = fond + ventes espèces − dépenses espèces. */
+    /** Total des règlements de factures fournisseurs payés en espèces sur la session. */
+    public function cashSupplierPayments(CashSession $session): float
+    {
+        return (float) \App\Models\SupplierPayment::where('cash_session_id', $session->id)
+            ->where('payment_method', PaymentMethod::Especes->value)
+            ->sum('amount');
+    }
+
+    /** Argent mis de côté (ou repris) en espèces pendant la session. */
+    public function cashReserveMoves(CashSession $session): float
+    {
+        return (float) \App\Models\ReserveMovement::where('cash_session_id', $session->id)
+            ->where('payment_method', PaymentMethod::Especes->value)
+            ->sum('amount');
+    }
+
+    /** Caisse théorique = fond + ventes espèces − dépenses espèces − factures fournisseurs − mises de côté. */
     public function expectedCash(CashSession $session): float
     {
         return (float) $session->opening_float
             + $this->cashSales($session)
-            - $this->cashExpenses($session);
+            - $this->cashExpenses($session)
+            - $this->cashSupplierPayments($session)
+            - $this->cashReserveMoves($session);
     }
 
     public function close(CashSession $session, float $countedCash): CashSession

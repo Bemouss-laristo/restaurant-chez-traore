@@ -9,6 +9,7 @@ use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Expense extends Model
 {
@@ -18,6 +19,9 @@ class Expense extends Model
     protected $fillable = [
         'user_id',
         'cash_session_id',
+        'supplier_id',
+        'staff_id',
+        'salary_month',
         'expense_category',
         'amount',
         'description',
@@ -38,6 +42,28 @@ class Expense extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function staff(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class);
+    }
+
+    /** Livraison prise à crédit : la dépense est comptée, mais l'argent n'est pas encore sorti. */
+    /** Mouvements de stock nés de cet achat : c'est là que sont les quantités. */
+    public function stockMovements(): MorphMany
+    {
+        return $this->morphMany(StockMovement::class, 'source');
+    }
+
+    public function isCredit(): bool
+    {
+        return $this->payment_method === \App\Enums\PaymentMethod::Credit;
     }
 
     public function cashSession(): BelongsTo

@@ -70,6 +70,16 @@
 
             {{-- ===== Formulaire de comptage ===== --}}
             <div class="bg-white shadow sm:rounded-lg p-6">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <h3 class="font-medium text-gray-800">
+                        {{ $onlyKey ? 'Comptage du soir — articles clés' : 'Comptage — tous les articles' }}
+                    </h3>
+                    @if ($keyCount > 0)
+                        <a href="{{ route('reconciliation.index', $onlyKey ? ['all' => 1] : []) }}" class="text-sm text-indigo-600 hover:underline">
+                            {{ $onlyKey ? 'Compter tous les articles →' : 'Revenir aux articles clés →' }}
+                        </a>
+                    @endif
+                </div>
                 <p class="text-sm text-gray-600 mb-4">
                     À la fermeture, compte physiquement chaque article et saisis la quantité réelle.
                     L'appli calcule l'écart avec le stock théorique (déduit des ventes enregistrées).

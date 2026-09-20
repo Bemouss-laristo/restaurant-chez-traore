@@ -17,29 +17,32 @@ use Illuminate\View\View;
 
 class StockItemController extends Controller
 {
+    /**
+     * La liste complète part dans la page : la recherche est alors instantanée,
+     * sans aller-retour réseau à chaque lettre tapée. Un restaurant suit quelques
+     * dizaines d'articles ; si la liste dépassait un jour le millier, il faudrait
+     * revenir à une recherche côté serveur.
+     */
     public function index(Request $request): View
     {
-        $search = trim((string) $request->query('search', ''));
-        $onlyLow = $request->boolean('low');
-
         $items = StockItem::query()
-            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
-            ->when($onlyLow, fn ($q) => $q->lowStock())
+            ->with('supplier')
             ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString();
+            ->get();
 
         return view('stock.index', [
             'items' => $items,
-            'search' => $search,
-            'onlyLow' => $onlyLow,
-            'lowCount' => StockItem::lowStock()->count(),
+            'lowCount' => $items->filter(fn (StockItem $item) => $item->isLow())->count(),
         ]);
     }
 
     public function create(): View
     {
-        return view('stock.create', ['units' => Unit::options()]);
+        return view('stock.create', [
+            'units' => Unit::options(),
+            'suppliers' => \App\Models\Supplier::active()->orderBy('name')->get(),
+            'paymentMethods' => \App\Enums\PaymentMethod::options(),
+        ]);
     }
 
     public function store(StoreStockItemRequest $request): RedirectResponse
@@ -56,6 +59,8 @@ class StockItemController extends Controller
         return view('stock.edit', [
             'item' => $stockItem,
             'units' => Unit::options(),
+            'suppliers' => \App\Models\Supplier::active()->orderBy('name')->get(),
+            'paymentMethods' => \App\Enums\PaymentMethod::options(),
             'movements' => $stockItem->movements()
                 ->with('user')
                 ->latest()

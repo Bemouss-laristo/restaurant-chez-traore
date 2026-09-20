@@ -129,11 +129,17 @@
                     search: '',
                     category: '',
                     cart: [],
+                    // Accents ignorés et mots dans n'importe quel ordre :
+                    // « hachee » trouve « Kebab haché », « ke po » trouve « Kebab poulet ».
+                    norm(v) {
+                        return (v ?? '').toString().toLowerCase()
+                            .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    },
                     get filteredProducts() {
-                        const s = this.search.toLowerCase();
+                        const words = this.norm(this.search).trim().split(/\s+/).filter(Boolean);
                         return this.products.filter(p =>
                             (this.category === '' || String(p.category_id) === String(this.category)) &&
-                            (s === '' || p.name.toLowerCase().includes(s))
+                            (words.length === 0 || words.every(w => this.norm(p.name).includes(w)))
                         );
                     },
                     add(p) {

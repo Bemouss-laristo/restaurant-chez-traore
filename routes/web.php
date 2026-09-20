@@ -1,17 +1,22 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CashSessionController;
 use App\Http\Controllers\CashierExpenseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\EnvelopeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PublicOrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StockItemController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StockReconciliationController;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +79,42 @@ Route::middleware(['auth', 'role:admin,gerant'])->group(function () {
         ->names('expenses')
         ->except(['show']);
 
+    // Achats : stock + dépense en une seule saisie.
+    Route::get('achats', [PurchaseController::class, 'create'])->name('purchases.create');
+    Route::post('achats', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::post('achats/prise-du-jour/{stockItem}', [PurchaseController::class, 'quick'])->name('purchases.quick');
+    Route::post('achats/configurer', [PurchaseController::class, 'configure'])->name('purchases.configure');
+    Route::put('achats/{expense}', [PurchaseController::class, 'updateQuantity'])->name('purchases.update');
+    Route::delete('achats/{expense}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
+
+    // Fournisseurs à compte : livraisons à crédit et règlements.
+    Route::get('fournisseurs', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::post('fournisseurs', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('fournisseurs/{supplier}', [SupplierController::class, 'show'])->name('suppliers.show');
+    Route::put('fournisseurs/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::delete('fournisseurs/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+    Route::post('fournisseurs/{supplier}/paiement', [SupplierController::class, 'pay'])->name('suppliers.pay');
+    Route::delete('fournisseurs/{supplier}/paiement/{payment}', [SupplierController::class, 'deletePayment'])->name('suppliers.payments.destroy');
+
+    // Employés et salaires.
+    Route::get('employes', [StaffController::class, 'index'])->name('staff.index');
+    Route::post('employes', [StaffController::class, 'store'])->name('staff.store');
+    Route::patch('employes/{staff}', [StaffController::class, 'update'])->name('staff.update');
+    Route::post('employes/{staff}/paiement', [StaffController::class, 'pay'])->name('staff.pay');
+
+    // Relevés d'argent disponible (caisse + comptes mobiles).
+    // Enveloppe du mois et réserve.
+    Route::get('enveloppe', [EnvelopeController::class, 'index'])->name('envelope.index');
+    Route::post('enveloppe', [EnvelopeController::class, 'store'])->name('envelope.store');
+    Route::post('enveloppe/reserve', [EnvelopeController::class, 'reserve'])->name('envelope.reserve');
+
+    Route::get('soldes', [BalanceController::class, 'index'])->name('balances.index');
+    Route::post('soldes', [BalanceController::class, 'store'])->name('balances.store');
+
+    Route::get('rapports/achats', [ReportController::class, 'purchases'])->name('reports.purchases');
+    Route::get('rapports/tresorerie', [ReportController::class, 'treasury'])->name('reports.treasury');
+    Route::post('rapports/tresorerie/budgets', [ReportController::class, 'storeBudgets'])->name('reports.budgets');
+    Route::get('rapports/materiel', [ReportController::class, 'material'])->name('reports.material');
     Route::get('rapports/journalier', [ReportController::class, 'daily'])->name('reports.daily');
     Route::get('rapports/hebdomadaire', [ReportController::class, 'weekly'])->name('reports.weekly');
     Route::get('rapports/mensuel', [ReportController::class, 'monthly'])->name('reports.monthly');

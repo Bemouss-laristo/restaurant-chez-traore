@@ -9,6 +9,8 @@
         </div>
     </x-slot>
 
+    @php($rows = $users->map(fn ($u) => trim($u->name.' '.$u->email.' '.$u->role->label()))->values())
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
@@ -23,12 +25,16 @@
                 </div>
             @endif
 
-            <div class="bg-white shadow sm:rounded-lg p-6">
-                <form method="GET" action="{{ route('admin.users.index') }}" class="mb-4 flex gap-2">
-                    <input type="text" name="search" value="{{ $search }}" placeholder="Rechercher un nom ou un email…"
+            <div class="bg-white shadow sm:rounded-lg p-6" x-data="liveSearch({
+                rows: @js($rows),
+                get shown() { return this.visibleCount; },
+            })">
+                <div class="mb-4 flex flex-wrap gap-2 items-center">
+                    <input type="search" x-model="search" placeholder="Rechercher un nom ou un email…" autocomplete="off"
                         class="border-gray-300 rounded-md shadow-sm w-full max-w-sm" />
-                    <button class="px-4 py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Rechercher</button>
-                </form>
+                    <span class="text-sm text-gray-500" x-show="search.trim() !== ''"
+                        x-text="shown + ' employé(s) sur {{ $users->count() }}'"></span>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -43,7 +49,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($users as $user)
-                                <tr>
+                                <tr x-show="match(@js($rows[$loop->index]))">
                                     <td class="px-4 py-3 font-medium text-gray-900">{{ $user->name }}</td>
                                     <td class="px-4 py-3 text-gray-600">{{ $user->email }}</td>
                                     <td class="px-4 py-3">
@@ -87,17 +93,22 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">Aucun employé trouvé.</td>
+                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">Aucun employé enregistré.</td>
                                 </tr>
                             @endforelse
+                            @if ($users->isNotEmpty())
+                                <tr x-show="shown === 0">
+                                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                                        Aucun employé ne correspond à cette recherche.
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
-                </div>
-
-                <div class="mt-4">
-                    {{ $users->links() }}
                 </div>
             </div>
         </div>
     </div>
+
+    @include('partials.live-search')
 </x-app-layout>

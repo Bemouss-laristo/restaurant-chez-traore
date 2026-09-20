@@ -21,11 +21,17 @@ use Illuminate\View\View;
  */
 class StockReconciliationController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        // Par défaut on ne demande que les ARTICLES CLÉS : un comptage court se fait
+        // vraiment tous les soirs, un comptage de 40 articles ne se fait jamais.
+        $onlyKey = ! $request->boolean('all') && StockItem::key()->exists();
+
         return view('stock.reconciliation', [
-            'rows' => $this->context(),
+            'rows' => $this->context($onlyKey),
             'results' => null,
+            'onlyKey' => $onlyKey,
+            'keyCount' => StockItem::key()->count(),
             'dateLabel' => Carbon::parse(BusinessDay::today())->format('d/m/Y'),
         ]);
     }
@@ -68,18 +74,20 @@ class StockReconciliationController extends Controller
         }
 
         return view('stock.reconciliation', [
-            'rows' => $this->context(),
+            'rows' => $this->context(false),
             'results' => $results,
+            'onlyKey' => false,
+            'keyCount' => StockItem::key()->count(),
             'dateLabel' => Carbon::parse(BusinessDay::today())->format('d/m/Y'),
         ]);
     }
 
     /** Théorique + entrées/sorties de la journée commerciale, par article. */
-    private function context(): Collection
+    private function context(bool $onlyKey = false): Collection
     {
         [$start, $end] = BusinessDay::window(BusinessDay::today());
 
-        return StockItem::orderBy('name')->get()->map(function (StockItem $item) use ($start, $end) {
+        return StockItem::when($onlyKey, fn ($q) => $q->key())->orderBy('name')->get()->map(function (StockItem $item) use ($start, $end) {
             $saleOut = (float) $item->movements()
                 ->where('type', StockMovementType::Out->value)
                 ->where('reason', StockMovementReason::Sale->value)

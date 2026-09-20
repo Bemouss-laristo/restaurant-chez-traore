@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ExpenseCategory;
 use App\Enums\PaymentMethod;
+use App\Http\Requests\ExpenseItems;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Expense;
@@ -63,6 +64,9 @@ class ExpenseController extends Controller
         $data = $request->validated();
         $user = $request->user();
         $data['user_id'] = $user->id;
+        $data['amount'] = ExpenseItems::total($data['items']);
+        $data['description'] = ExpenseItems::describe($data['items']);
+        unset($data['items']);
 
         // Une dépense en espèces sort du tiroir : on la rattache à la caisse ouverte.
         if (PaymentMethod::from($data['payment_method'])->affectsCashDrawer()) {
@@ -85,7 +89,12 @@ class ExpenseController extends Controller
 
     public function update(UpdateExpenseRequest $request, Expense $expense): RedirectResponse
     {
-        $expense->update($request->validated());
+        $data = $request->validated();
+        $data['amount'] = ExpenseItems::total($data['items']);
+        $data['description'] = ExpenseItems::describe($data['items']);
+        unset($data['items']);
+
+        $expense->update($data);
 
         return redirect()->route('expenses.index')->with('status', 'Dépense mise à jour.');
     }

@@ -15,6 +15,7 @@ enum Unit: string
     case Litre = 'litre';
     case Millilitre = 'ml';
     case Piece = 'piece';
+    case Paquet = 'paquet';
 
     public function label(): string
     {
@@ -24,6 +25,7 @@ enum Unit: string
             self::Litre => 'Litre (L)',
             self::Millilitre => 'Millilitre (ml)',
             self::Piece => 'Pièce',
+            self::Paquet => 'Paquet',
         };
     }
 

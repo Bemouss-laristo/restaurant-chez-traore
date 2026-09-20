@@ -80,6 +80,12 @@
                             Clôturer
                         </button>
                     </form>
+                    @can('manage-stock')
+                        <p class="mt-3 text-sm text-gray-500">
+                            Avant de clôturer : <a href="{{ route('reconciliation.index') }}" class="text-indigo-600 hover:underline font-medium">faire le comptage du soir</a>
+                            (pain, poulet, boissons) pour détecter les manques le jour même.
+                        </p>
+                    @endcan
                 </div>
             @endif
 

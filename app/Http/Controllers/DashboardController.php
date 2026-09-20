@@ -26,7 +26,7 @@ class DashboardController extends Controller
             'today' => $today,
             'businessDate' => Carbon::parse(BusinessDay::today()),
             'canSeeFinance' => $canSeeFinance,
-            'topProducts' => $canSeeFinance ? $this->dashboard->topProducts() : collect(),
+            'monthProducts' => $canSeeFinance ? $this->dashboard->monthProducts() : collect(),
             'lowStock' => $canSeeFinance ? $this->dashboard->lowStockItems() : collect(),
             'alerts' => $canSeeFinance ? $this->dashboard->alerts($today) : [],
         ]);

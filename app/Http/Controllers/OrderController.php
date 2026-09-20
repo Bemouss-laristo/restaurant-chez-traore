@@ -34,7 +34,7 @@ class OrderController extends Controller
                 ->limit(15)
                 ->get(),
             'pendingCount' => Order::pending()->count(),
-            'paymentMethods' => PaymentMethod::options(),
+            'paymentMethods' => PaymentMethod::salesOptions(),
         ]);
     }
 
@@ -59,7 +59,7 @@ class OrderController extends Controller
     /** Encaisse une commande : crée la vente (stock + rapports + caisse). */
     public function checkout(Request $request, Order $order): RedirectResponse
     {
-        $request->validate(['payment_method' => ['required', Rule::enum(PaymentMethod::class)]]);
+        $request->validate(['payment_method' => ['required', Rule::enum(PaymentMethod::class)->except(PaymentMethod::Credit)]]);
 
         if ($order->status === OrderStatus::Terminee) {
             return back()->with('error', 'Cette commande a déjà été encaissée.');

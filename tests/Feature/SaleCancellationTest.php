@@ -207,7 +207,7 @@ class SaleCancellationTest extends TestCase
             ->assertOk()
             ->assertSee('*** CUISINE ***')
             ->assertDontSee('*** CLIENT ***')
-            ->assertDontSee('location.replace', false);
+            ->assertSee('var nextUrl = null', false);
     }
 
     public function test_sale_page_shows_the_cancel_form_to_the_cashier(): void

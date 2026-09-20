@@ -18,7 +18,7 @@ class StoreSaleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
+            'payment_method' => ['required', Rule::enum(PaymentMethod::class)->except(PaymentMethod::Credit)],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],

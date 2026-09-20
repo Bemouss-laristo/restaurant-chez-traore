@@ -18,24 +18,12 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
+    /** Toute la carte part dans la page : la recherche filtre alors à la frappe. */
     public function index(Request $request): View
     {
-        $search = trim((string) $request->query('search', ''));
-        $categoryId = $request->integer('category_id');
-
-        $products = Product::query()
-            ->with('category')
-            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
-            ->when($categoryId, fn ($q) => $q->where('product_category_id', $categoryId))
-            ->orderBy('name')
-            ->paginate(12)
-            ->withQueryString();
-
         return view('products.index', [
-            'products' => $products,
+            'products' => Product::query()->with('category')->orderBy('name')->get(),
             'categories' => ProductCategory::orderBy('name')->get(),
-            'search' => $search,
-            'categoryId' => $categoryId,
         ]);
     }
 

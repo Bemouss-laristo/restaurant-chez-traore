@@ -117,16 +117,25 @@
 
   <script>
     // Impression automatique de CET exemplaire dès l'ouverture (fenêtre ou cadre invisible).
-    // window.print() attend la fin de l'impression : on enchaîne ensuite sur le ticket
-    // CUISINE, qui part dans une impression SÉPARÉE (donc un ticket coupé à part).
-    window.addEventListener('load', function () {
-      setTimeout(function () {
-        window.print();
-        @if ($nextUrl)
-          setTimeout(function () { location.replace(@js($nextUrl)); }, 800);
-        @endif
-      }, 250);
-    });
+    // Une fois l'impression envoyée, on enchaîne sur le ticket CUISINE, qui part dans une
+    // impression SÉPARÉE. Compatible Firefox et Chrome.
+    (function () {
+      var nextUrl = @js($nextUrl);
+      var done = false;
+      function goNext() {
+        if (done || !nextUrl) { return; }
+        done = true;
+        setTimeout(function () { location.replace(nextUrl); }, 1000);
+      }
+      window.addEventListener('afterprint', goNext);
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          window.print();
+          // Sécurité si le navigateur ne signale pas la fin de l'impression.
+          setTimeout(goNext, 4000);
+        }, 300);
+      });
+    })();
   </script>
 </body>
 </html>

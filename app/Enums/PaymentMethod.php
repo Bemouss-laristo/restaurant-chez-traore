@@ -17,6 +17,8 @@ enum PaymentMethod: string
     case Bankily = 'bankily';
     case Sedad = 'sedad';
     case Masrivi = 'masrivi';
+    /** Livraison prise à crédit sur un compte fournisseur, payée en fin de mois. */
+    case Credit = 'credit';
 
     public function label(): string
     {
@@ -25,6 +27,7 @@ enum PaymentMethod: string
             self::Bankily => 'Bankily',
             self::Sedad => 'Sedad',
             self::Masrivi => 'Masrivi',
+            self::Credit => 'À crédit (compte fournisseur)',
         };
     }
 
@@ -35,6 +38,16 @@ enum PaymentMethod: string
     public function affectsCashDrawer(): bool
     {
         return $this === self::Especes;
+    }
+
+    /** Modes de paiement possibles pour une VENTE (jamais à crédit). */
+    public static function salesOptions(): array
+    {
+        return array_reduce(
+            array_filter(self::cases(), fn (self $m) => $m !== self::Credit),
+            fn (array $carry, self $m) => $carry + [$m->value => $m->label()],
+            [],
+        );
     }
 
     public static function options(): array

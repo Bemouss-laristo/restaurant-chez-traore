@@ -75,17 +75,36 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {{-- Meilleures ventes --}}
+                    {{-- Tous les produits vendus ce mois --}}
                     <div class="bg-white shadow sm:rounded-lg p-6">
-                        <h3 class="font-medium text-gray-800 mb-4">Produits les plus vendus (30 j)</h3>
-                        @forelse ($topProducts as $p)
-                            <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                                <span class="text-gray-800">{{ $p->name }}</span>
-                                <span class="text-sm text-gray-500">{{ (int) $p->qty }} vendus · @mru($p->revenue)</span>
-                            </div>
-                        @empty
-                            <p class="text-sm text-gray-500">Pas encore de ventes sur la période.</p>
-                        @endforelse
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium text-gray-800">Produits vendus ce mois</h3>
+                            <a href="{{ route('reports.material') }}" class="text-sm text-indigo-600 hover:underline">Contrôle matière →</a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                <thead>
+                                    <tr class="text-left text-gray-500">
+                                        <th class="px-2 py-2">Produit</th>
+                                        <th class="px-2 py-2 text-right">Qté</th>
+                                        <th class="px-2 py-2 text-right">CA</th>
+                                        <th class="px-2 py-2 text-right">Marge</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @forelse ($monthProducts as $p)
+                                        <tr>
+                                            <td class="px-2 py-2 text-gray-800">{{ $p->name }}</td>
+                                            <td class="px-2 py-2 text-right text-gray-600">{{ (int) $p->qty }}</td>
+                                            <td class="px-2 py-2 text-right font-medium text-green-700">@mru($p->revenue)</td>
+                                            <td class="px-2 py-2 text-right text-indigo-600">@mru($p->margin)</td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="4" class="px-2 py-4 text-center text-gray-500">Pas encore de ventes ce mois.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     {{-- Stock faible --}}
