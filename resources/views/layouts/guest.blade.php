@@ -11,6 +11,8 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
+        @include('partials.pwa-head')
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
@@ -31,7 +33,10 @@
                 {{ $slot }}
             </div>
 
-            <div class="relative mt-6 text-xs text-cocoa-400">© {{ date('Y') }} Chez Traoré</div>
+            <div class="relative mt-6 flex animate-fade-up flex-col items-center gap-4 [animation-delay:200ms]">
+                @include('partials.install-app', ['variant' => 'login'])
+                <span class="text-xs text-cocoa-400">© {{ date('Y') }} Chez Traoré</span>
+            </div>
         </div>
     </body>
 </html>

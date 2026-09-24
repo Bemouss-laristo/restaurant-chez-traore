@@ -11,6 +11,7 @@
     <script>document.documentElement.classList.add('js');</script>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+    @include('partials.pwa-head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Icônes de marque (WhatsApp) fournies par la bibliothèque Font Awesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -47,10 +48,13 @@
                 @endforeach
             </nav>
 
+            <div class="flex items-center gap-2">
+            @include('partials.install-app', ['variant' => 'site-header'])
             <a href="{{ route('order.create') }}"
                 class="shine inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-900/30 transition hover:-translate-y-0.5 hover:bg-brand-400">
                 <x-icon name="cart" class="h-5 w-5" /> Commander
             </a>
+            </div>
         </div>
     </header>
 
@@ -285,6 +289,59 @@
                     Écrivez-nous <x-icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
             </a>
+        </div>
+    </section>
+
+    {{-- ============ Application à installer ============ --}}
+    <section id="application" class="px-4 pb-16 sm:pb-20">
+        <div class="reveal relative mx-auto grid max-w-6xl items-center gap-10 overflow-hidden rounded-[2rem] bg-cocoa-950 px-6 py-12 text-white shadow-lift sm:px-12 lg:grid-cols-2">
+            <div class="drift pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-brand-500/25 blur-3xl"></div>
+            <div class="drift-slow pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-brand-700/30 blur-3xl"></div>
+
+            <div class="relative">
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-200 ring-1 ring-white/15">
+                    <x-icon name="phone" class="h-4 w-4" /> Application
+                </span>
+                <h2 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                    Chez Traoré <span class="text-flame">dans votre poche</span>
+                </h2>
+                <p class="mt-3 max-w-md text-lg text-cocoa-300">
+                    Installez l'application sur votre téléphone ou votre ordinateur : une icône, un geste, et le menu est là.
+                </p>
+
+                <ul class="mt-6 grid gap-3 text-sm text-cocoa-200 sm:grid-cols-3">
+                    @foreach ([['bolt', 'Ouverture rapide'], ['phone', 'Plein écran'], ['download', 'Léger, sans store']] as $i => [$icon, $label])
+                        <li class="reveal flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2.5 ring-1 ring-white/10" style="--d: {{ 100 + $i * 90 }}ms">
+                            <x-icon :name="$icon" class="h-5 w-5 shrink-0 text-brand-300" /> {{ $label }}
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="mt-8">
+                    @include('partials.install-app', ['variant' => 'site-card'])
+                </div>
+            </div>
+
+            {{-- Téléphone stylisé avec l'icône de l'appli --}}
+            <div class="relative mx-auto hidden h-[25rem] w-56 sm:block" aria-hidden="true">
+                <div class="float absolute inset-0 rounded-[2.5rem] border-[10px] border-cocoa-800 bg-gradient-to-b from-cocoa-900 to-cocoa-950 shadow-2xl shadow-black/50" style="--rot: -3deg">
+                    <div class="mx-auto mt-2 h-4 w-20 rounded-full bg-cocoa-800"></div>
+                    <div class="mt-8 grid grid-cols-3 gap-4 px-5">
+                        @for ($i = 0; $i < 6; $i++)
+                            <span class="aspect-square rounded-xl bg-white/[0.06]"></span>
+                        @endfor
+                        <span class="col-start-2 flex flex-col items-center gap-1.5">
+                            <img src="/icons/icon-192.png" alt="" class="animate-soft-pulse aspect-square w-full rounded-xl shadow-lg shadow-brand-900/60 ring-2 ring-brand-300/50">
+                            <span class="text-[9px] font-semibold text-white">Chez Traoré</span>
+                        </span>
+                    </div>
+                    <div class="absolute inset-x-5 bottom-6 flex justify-between rounded-2xl bg-white/[0.06] p-3">
+                        @for ($i = 0; $i < 4; $i++)
+                            <span class="h-7 w-7 rounded-lg bg-white/10"></span>
+                        @endfor
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

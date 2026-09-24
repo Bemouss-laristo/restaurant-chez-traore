@@ -51,4 +51,66 @@ Alpine.data('clock', () => ({
     },
 }));
 
+/*
+ * Application installable (PWA).
+ *
+ * Chrome, Edge et Android proposent l'installation via l'événement
+ * « beforeinstallprompt » : on le garde de côté pour le déclencher quand
+ * l'utilisateur clique sur « Installer ». Les autres navigateurs (iPhone,
+ * Firefox) ne le proposent pas : le bouton affiche alors la marche à suivre.
+ */
+let installPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    window.dispatchEvent(new CustomEvent('app-installable'));
+});
+
+window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    window.dispatchEvent(new CustomEvent('app-installed'));
+});
+
+// Le service worker n'est accepté qu'en HTTPS (ou sur localhost).
+if ('serviceWorker' in navigator && window.isSecureContext) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+
+function detectPlatform() {
+    const ua = navigator.userAgent;
+    const ios = /iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+    if (ios) return 'ios';
+    const android = /android/i.test(ua);
+    if (/firefox|fxios/i.test(ua)) return android ? 'firefox-android' : 'firefox-desktop';
+    if (/samsungbrowser/i.test(ua)) return 'samsung';
+    return android ? 'android' : 'desktop';
+}
+
+Alpine.data('installApp', () => ({
+    installed: window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true,
+    ready: installPrompt !== null,
+    help: false,
+    platform: detectPlatform(),
+
+    init() {
+        window.addEventListener('app-installable', () => { this.ready = true; });
+        window.addEventListener('app-installed', () => { this.installed = true; this.help = false; });
+    },
+
+    async install() {
+        if (!installPrompt) {
+            this.help = true;
+            return;
+        }
+        installPrompt.prompt();
+        const { outcome } = await installPrompt.userChoice;
+        installPrompt = null;
+        this.ready = false;
+        if (outcome === 'accepted') this.installed = true;
+    },
+}));
+
 Alpine.start();

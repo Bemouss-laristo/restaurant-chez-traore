@@ -110,6 +110,7 @@
 
     {{-- Utilisateur connecté --}}
     <div class="border-t border-white/10 p-3">
+        @include('partials.install-app', ['variant' => 'sidebar'])
         <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
             <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-300 to-brand-600 text-sm font-bold text-white ring-2 ring-white/10">
                 {{ $initials ?: '?' }}

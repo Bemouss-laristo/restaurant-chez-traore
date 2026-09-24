@@ -21,6 +21,11 @@ use App\Http\Controllers\StockReconciliationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    // L'application installée s'ouvre ici : l'équipe connectée va droit à son espace.
+    if (request('source') === 'app' && auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
     $featured = \App\Models\Product::active()->whereNotNull('image_path')->inRandomOrder()->limit(6)->get();
     if ($featured->isEmpty()) {
         $featured = \App\Models\Product::active()->inRandomOrder()->limit(6)->get();
