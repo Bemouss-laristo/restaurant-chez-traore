@@ -156,3 +156,137 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* =====================================================================
+ * Site public (page d'accueil) — tout est rangé sous `.site`.
+ * ===================================================================== */
+
+/* Braises qui montent du bas du héro, comme au-dessus d'un grill. */
+@keyframes ember {
+    0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translate3d(var(--drift, 20px), -85vh, 0) scale(0.2); opacity: 0; }
+}
+
+.site .ember {
+    position: absolute;
+    bottom: -10px;
+    width: var(--size, 6px);
+    height: var(--size, 6px);
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fff3c4 0%, #fdbc6d 40%, #f5760e 75%, transparent 100%);
+    box-shadow: 0 0 10px 2px rgba(245, 118, 14, 0.55);
+    animation: ember var(--dur, 7s) linear var(--delay, 0s) infinite;
+    will-change: transform, opacity;
+}
+
+/* Halos chauds qui dérivent lentement. */
+@keyframes drift {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(30px, -25px, 0) scale(1.08); }
+}
+
+.site .drift { animation: drift 14s ease-in-out infinite; }
+.site .drift-slow { animation: drift 20s ease-in-out -6s infinite reverse; }
+
+/* Plats qui flottent dans le héro. */
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+    50% { transform: translateY(-14px) rotate(calc(var(--rot, 0deg) + 1.5deg)); }
+}
+
+.site .float { animation: float 6s ease-in-out var(--delay, 0s) infinite; }
+
+/* Titre : les mots arrivent un à un, puis le dégradé ondule doucement. */
+@keyframes word-in {
+    0% { opacity: 0; transform: translateY(0.6em); filter: blur(8px); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.site .word {
+    display: inline-block;
+    opacity: 0;
+    animation: word-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0s) forwards;
+}
+
+@keyframes gradient-pan {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.site .text-flame {
+    background: linear-gradient(100deg, #fdbc6d, #f5760e, #fed9a6, #fb9534);
+    background-size: 250% 250%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-pan 6s ease-in-out infinite;
+}
+
+/* Reflet qui balaie le bouton « Commander ». */
+@keyframes shine {
+    0% { transform: translateX(-120%) skewX(-20deg); }
+    60%, 100% { transform: translateX(220%) skewX(-20deg); }
+}
+
+.site .shine { position: relative; overflow: hidden; isolation: isolate; }
+.site .shine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    animation: shine 3.2s ease-in-out 1.5s infinite;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Bandeau des spécialités qui défile sans fin. */
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.site .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 32s linear infinite;
+}
+
+.site .marquee:hover .marquee-track { animation-play-state: paused; }
+
+/* Apparition au défilement. Masqué seulement si le script tourne (classe `js`),
+   pour qu'un navigateur sans JavaScript affiche tout normalement. */
+.js .site .reveal {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--d, 0ms);
+}
+
+.js .site .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Petite flèche qui invite à descendre. */
+@keyframes nudge {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(8px); opacity: 1; }
+}
+
+.site .nudge { animation: nudge 1.8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+    .site *,
+    .site *::before,
+    .site *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .site .word { opacity: 1; }
+    .site .ember { display: none; }
+    .js .site .reveal { opacity: 1; transform: none; }
+}
