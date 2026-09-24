@@ -12,7 +12,7 @@
 --}}
 <script>
     function liveSearch(extra = {}) {
-        return Object.assign({
+        const base = {
             search: '',
 
             normalize(value) {
@@ -40,6 +40,13 @@
             get visibleCount() {
                 return (this.rows ?? []).filter((row) => this.match(row)).length;
             },
-        }, extra);
+        };
+
+        // Surtout pas Object.assign : il EXÉCUTE les getters de `extra` (« shown »)
+        // au moment de la copie, hors du composant, où `this.match` n'existe pas.
+        // Le calcul plantait, tout le composant tombait et les lignes restaient
+        // cachées — la liste du stock et des produits paraissait vide.
+        // On copie donc les propriétés telles quelles, getters compris.
+        return Object.defineProperties(base, Object.getOwnPropertyDescriptors(extra));
     }
 </script>

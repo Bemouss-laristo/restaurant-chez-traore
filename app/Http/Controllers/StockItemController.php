@@ -78,17 +78,45 @@ class StockItemController extends Controller
             ->with('status', 'Article mis à jour.');
     }
 
+    /**
+     * Supprimer un article.
+     *
+     *  - encore utilisé dans une recette : refusé, avec la liste des produits.
+     *    L'effacer ferait disparaître l'ingrédient de la recette sans prévenir,
+     *    et les ventes cesseraient de le déduire du stock ;
+     *  - déjà utilisé (achats, ventes, comptages) : archivé. Il sort des listes
+     *    et des formulaires, ses mouvements restent dans les rapports ;
+     *  - jamais utilisé : effacé pour de bon.
+     */
     public function destroy(StockItem $stockItem): RedirectResponse
     {
-        // On refuse la suppression d'un article déjà utilisé (recettes ou mouvements),
-        // pour ne pas casser l'historique. On le laisse plutôt à zéro.
-        if ($stockItem->movements()->exists() || $stockItem->products()->exists()) {
-            return back()->with('error', "Cet article est utilisé (recette ou mouvements) et ne peut pas être supprimé.");
+        $products = $stockItem->products()->orderBy('name')->pluck('name');
+
+        if ($products->isNotEmpty()) {
+            return back()->with('error', sprintf(
+                '« %s » est encore dans la recette de : %s. Retire-le d\'abord de ces recettes (Produits → Modifier → Recette).',
+                $stockItem->name,
+                $products->implode(', '),
+            ));
         }
 
-        $stockItem->delete();
+        $name = $stockItem->name;
 
-        return back()->with('status', 'Article supprimé.');
+        if ($stockItem->movements()->exists()) {
+            // Le nom est libéré pour pouvoir recréer un article du même nom plus tard.
+            $stockItem->update(['name' => $name.' (archivé #'.$stockItem->id.')']);
+            $stockItem->delete();
+
+            return redirect()
+                ->route('stock-items.index')
+                ->with('status', '« '.$name.' » archivé : il n\'apparaît plus dans les listes, son historique reste dans les rapports.');
+        }
+
+        $stockItem->forceDelete();
+
+        return redirect()
+            ->route('stock-items.index')
+            ->with('status', '« '.$name.' » supprimé.');
     }
 
     /** Enregistre une entrée / sortie / ajustement via le service dédié. */

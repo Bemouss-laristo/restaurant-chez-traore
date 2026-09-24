@@ -75,7 +75,7 @@
                         {{ $onlyKey ? 'Comptage du soir — articles clés' : 'Comptage — tous les articles' }}
                     </h3>
                     @if ($keyCount > 0)
-                        <a href="{{ route('reconciliation.index', $onlyKey ? ['all' => 1] : []) }}" class="text-sm text-indigo-600 hover:underline">
+                        <a href="{{ route('reconciliation.index', $onlyKey ? ['all' => 1] : []) }}" class="text-sm text-brand-600 hover:underline">
                             {{ $onlyKey ? 'Compter tous les articles →' : 'Revenir aux articles clés →' }}
                         </a>
                     @endif
@@ -122,7 +122,7 @@
                     </div>
 
                     <div class="mt-5 flex items-center justify-end">
-                        <button class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                        <button class="px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                             Calculer les écarts
                         </button>
                     </div>

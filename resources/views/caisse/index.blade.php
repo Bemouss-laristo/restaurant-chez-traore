@@ -52,11 +52,11 @@
                         <div class="bg-red-50 rounded-md p-4">
                             <div class="text-xs text-gray-500">Dépenses espèces</div>
                             <div class="text-lg font-semibold text-red-700">−@mru($cashExpenses)</div>
-                            <a href="{{ route('cashier-expenses.index') }}" class="text-xs text-indigo-600 hover:underline">+ Noter une dépense</a>
+                            <a href="{{ route('cashier-expenses.index') }}" class="text-xs text-brand-600 hover:underline">+ Noter une dépense</a>
                         </div>
-                        <div class="bg-indigo-50 rounded-md p-4">
+                        <div class="bg-brand-50 rounded-md p-4">
                             <div class="text-xs text-gray-500">Caisse théorique</div>
-                            <div class="text-lg font-semibold text-indigo-700">@mru($expected)</div>
+                            <div class="text-lg font-semibold text-brand-700">@mru($expected)</div>
                         </div>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                     </form>
                     @can('manage-stock')
                         <p class="mt-3 text-sm text-gray-500">
-                            Avant de clôturer : <a href="{{ route('reconciliation.index') }}" class="text-indigo-600 hover:underline font-medium">faire le comptage du soir</a>
+                            Avant de clôturer : <a href="{{ route('reconciliation.index') }}" class="text-brand-600 hover:underline font-medium">faire le comptage du soir</a>
                             (pain, poulet, boissons) pour détecter les manques le jour même.
                         </p>
                     @endcan

@@ -19,7 +19,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-white shadow sm:rounded-lg p-5">
                         <div class="text-sm text-gray-500">Argent disponible</div>
-                        <div class="text-2xl font-bold text-indigo-600 mt-1">@mru($latest->total())</div>
+                        <div class="text-2xl font-bold text-brand-600 mt-1">@mru($latest->total())</div>
                         <div class="text-xs text-gray-400 mt-1">Relevé du {{ $latest->recorded_on->format('d/m/Y') }}</div>
                     </div>
                     <div class="bg-white shadow sm:rounded-lg p-5">
@@ -108,7 +108,7 @@
                                     <td class="px-3 py-2 text-right">@mru($snapshot->bankily)</td>
                                     <td class="px-3 py-2 text-right">@mru($snapshot->masrivi)</td>
                                     <td class="px-3 py-2 text-right">@mru($snapshot->sedad)</td>
-                                    <td class="px-3 py-2 text-right font-semibold text-indigo-600">@mru($snapshot->total())</td>
+                                    <td class="px-3 py-2 text-right font-semibold text-brand-600">@mru($snapshot->total())</td>
                                     <td class="px-3 py-2 text-gray-600">{{ $snapshot->user->name ?? '—' }}</td>
                                 </tr>
                             @empty

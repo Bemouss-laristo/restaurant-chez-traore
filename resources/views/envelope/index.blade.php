@@ -55,7 +55,7 @@
                 </div>
                 <div class="bg-white shadow sm:rounded-lg p-5 {{ $report['remaining'] < 0 ? 'bg-red-50' : '' }}">
                     <div class="text-sm text-gray-500">Reste dans l'enveloppe</div>
-                    <div class="text-2xl font-bold mt-1 {{ $report['remaining'] < 0 ? 'text-red-700' : 'text-indigo-600' }}">@mru($report['remaining'])</div>
+                    <div class="text-2xl font-bold mt-1 {{ $report['remaining'] < 0 ? 'text-red-700' : 'text-brand-600' }}">@mru($report['remaining'])</div>
                     <div class="mt-2 text-xs text-gray-500">Dont surplus mobilisable : <span class="font-medium text-gray-700">@mru($report['surplus'])</span></div>
                 </div>
             </div>
@@ -119,11 +119,11 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Mis de côté ce mois</span>
-                            <span class="text-lg font-semibold text-indigo-600">@mru($report['setAside'])</span>
+                            <span class="text-lg font-semibold text-brand-600">@mru($report['setAside'])</span>
                         </div>
                         <div class="flex justify-between items-center border-t border-gray-200 pt-3">
                             <span class="text-gray-800 font-medium">Réserve totale (tous mois)</span>
-                            <span class="text-xl font-bold text-indigo-700">@mru($report['reserveTotal'])</span>
+                            <span class="text-xl font-bold text-brand-700">@mru($report['reserveTotal'])</span>
                         </div>
                     </div>
                     @if ($report['surplus'] > 0)
@@ -140,7 +140,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label for="direction" value="Opération" />
-                                <select id="direction" name="direction" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="direction" name="direction" class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                     <option value="set_aside">Mettre de côté</option>
                                     <option value="take_back">Reprendre de la réserve</option>
                                 </select>
@@ -151,7 +151,7 @@
                             </div>
                             <div>
                                 <x-input-label for="payment_method" value="D'où sort l'argent" />
-                                <select id="payment_method" name="payment_method" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="payment_method" name="payment_method" class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                     @foreach ($paymentMethods as $value => $label)
                                         <option value="{{ $value }}">{{ $label }}</option>
                                     @endforeach
@@ -199,7 +199,7 @@
                                     <td class="px-3 py-2 text-gray-600">{{ $movement->payment_method->label() }}</td>
                                     <td class="px-3 py-2 text-gray-600">{{ $movement->user->name ?? '—' }}</td>
                                     <td class="px-3 py-2 text-gray-600">{{ $movement->note ?: '—' }}</td>
-                                    <td class="px-3 py-2 text-right font-medium {{ $movement->isWithdrawal() ? 'text-amber-700' : 'text-indigo-700' }}">@mru($movement->amount)</td>
+                                    <td class="px-3 py-2 text-right font-medium {{ $movement->isWithdrawal() ? 'text-amber-700' : 'text-brand-700' }}">@mru($movement->amount)</td>
                                 </tr>
                             @empty
                                 <tr><td colspan="6" class="px-3 py-6 text-center text-gray-500">Aucun mouvement ce mois.</td></tr>

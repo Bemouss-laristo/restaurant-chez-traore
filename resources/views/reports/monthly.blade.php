@@ -27,7 +27,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Chiffre d'affaires</div><div class="text-2xl font-bold text-green-600 mt-1">@mru($report['salesTotal'])</div></div>
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Dépenses</div><div class="text-2xl font-bold text-red-600 mt-1">@mru($report['expensesTotal'])</div></div>
-                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Bénéfice</div><div class="text-2xl font-bold mt-1 {{ $report['profit'] < 0 ? 'text-red-600' : 'text-indigo-600' }}">@mru($report['profit'])</div></div>
+                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Bénéfice</div><div class="text-2xl font-bold mt-1 {{ $report['profit'] < 0 ? 'text-red-600' : 'text-brand-600' }}">@mru($report['profit'])</div></div>
             </div>
 
             <div class="bg-white shadow sm:rounded-lg p-6">
@@ -81,7 +81,7 @@
                                     <td class="px-3 py-2 text-right">{{ (int) $p->qty }}</td>
                                     <td class="px-3 py-2 text-right font-medium text-green-700">@mru($p->revenue)</td>
                                     <td class="px-3 py-2 text-right text-gray-600">@mru($p->cost)</td>
-                                    <td class="px-3 py-2 text-right font-medium text-indigo-600">@mru($p->margin)</td>
+                                    <td class="px-3 py-2 text-right font-medium text-brand-600">@mru($p->margin)</td>
                                     <td class="px-3 py-2 text-right text-gray-500">{{ $p->revenue > 0 ? number_format($p->margin / $p->revenue * 100, 0, ',', ' ') : 0 }} %</td>
                                 </tr>
                             @empty

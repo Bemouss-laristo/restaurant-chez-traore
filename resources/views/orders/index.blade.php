@@ -7,7 +7,7 @@
                     <span class="ms-2 px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">{{ $pendingCount }} nouvelle(s)</span>
                 @endif
             </h2>
-            <a href="{{ route('order.create') }}" target="_blank" class="text-sm text-indigo-600 hover:underline">Voir la page client ↗</a>
+            <a href="{{ route('order.create') }}" target="_blank" class="text-sm text-brand-600 hover:underline">Voir la page client ↗</a>
         </div>
     </x-slot>
 
@@ -32,7 +32,7 @@
                                 <span class="text-xs text-gray-400">{{ $order->created_at->format('d/m H:i') }}</span>
                             </div>
                             <div class="mt-1 font-medium text-gray-900">{{ $order->customer_name }}</div>
-                            <a href="tel:{{ $order->customer_phone }}" class="text-sm text-indigo-600 hover:underline">📞 {{ $order->customer_phone }}</a>
+                            <a href="tel:{{ $order->customer_phone }}" class="text-sm text-brand-600 hover:underline">📞 {{ $order->customer_phone }}</a>
                             @if ($order->note)
                                 <div class="mt-1 text-sm text-amber-700">Note : {{ $order->note }}</div>
                             @endif
@@ -96,7 +96,7 @@
                                 <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $order->status->badgeClass() }}">{{ $order->status->label() }}</span>
                                 <span class="text-gray-500">@mru($order->total)</span>
                                 @if ($order->sale_id)
-                                    <a href="{{ route('sales.show', $order->sale_id) }}" class="text-indigo-600 hover:underline text-xs">
+                                    <a href="{{ route('sales.show', $order->sale_id) }}" class="text-brand-600 hover:underline text-xs">
                                         {{ $order->status === \App\Enums\OrderStatus::Terminee ? 'Voir / Annuler' : 'Voir la vente' }}
                                     </a>
                                 @else

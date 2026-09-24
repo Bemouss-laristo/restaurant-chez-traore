@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $supplier->name }} — relevé de {{ $monthLabel }}</h2>
-            <a href="{{ route('suppliers.index') }}" class="text-sm text-indigo-600 hover:underline">← Tous les fournisseurs</a>
+            <a href="{{ route('suppliers.index') }}" class="text-sm text-brand-600 hover:underline">← Tous les fournisseurs</a>
         </div>
     </x-slot>
 
@@ -60,7 +60,7 @@
                         @foreach ($items as $item)
                             <div class="flex flex-wrap items-center justify-between gap-2 border border-gray-200 rounded-md p-3 text-sm">
                                 <div>
-                                    <a href="{{ route('stock-items.edit', $item) }}" class="font-medium text-indigo-600 hover:underline">{{ $item->name }}</a>
+                                    <a href="{{ route('stock-items.edit', $item) }}" class="font-medium text-brand-600 hover:underline">{{ $item->name }}</a>
                                     <span class="text-gray-600">
                                         — en stock : {{ rtrim(rtrim(number_format((float) $item->quantity, 3, ',', ' '), '0'), ',') }} {{ $item->unit->value }}
                                     </span>
@@ -256,7 +256,7 @@
                     </div>
                     <div>
                         <x-input-label for="payment_method" value="Moyen de paiement" />
-                        <select id="payment_method" name="payment_method" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                        <select id="payment_method" name="payment_method" class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                             @foreach ($paymentMethods as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
                             @endforeach

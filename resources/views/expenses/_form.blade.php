@@ -12,7 +12,7 @@
         <div>
             <x-input-label for="expense_category" value="Catégorie" />
             <select id="expense_category" name="expense_category"
-                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                 @foreach ($categories as $value => $label)
                     <option value="{{ $value }}"
                         @selected(old('expense_category', $expense->expense_category->value ?? '') === $value)>{{ $label }}</option>
@@ -31,7 +31,7 @@
         <div>
             <x-input-label for="payment_method" value="Mode de paiement" />
             <select id="payment_method" name="payment_method"
-                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                 @foreach ($paymentMethods as $value => $label)
                     <option value="{{ $value }}"
                         @selected(old('payment_method', $expense->payment_method->value ?? 'especes') === $value)>{{ $label }}</option>
@@ -51,18 +51,18 @@
                 <div class="flex items-center gap-2">
                     <input type="text" :name="`items[${idx}][label]`" x-model="row.label"
                         placeholder="Article (ex : sac de charbon)" maxlength="100"
-                        class="flex-1 min-w-0 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                        class="flex-1 min-w-0 border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                     <input type="number" :name="`items[${idx}][price]`" x-model="row.price"
                         placeholder="Prix" min="1" step="1" inputmode="numeric"
                         x-on:keydown.enter.prevent="addRow()"
-                        class="w-28 text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                        class="w-28 text-right border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                     <button type="button" x-on:click="removeRow(idx)" title="Supprimer la ligne"
                         class="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">×</button>
                 </div>
             </template>
         </div>
 
-        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-indigo-600 hover:underline">+ Ajouter un article</button>
+        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-brand-600 hover:underline">+ Ajouter un article</button>
 
         @if ($errors->has('items') || $errors->has('items.*'))
             <p class="mt-2 text-sm text-red-600">{{ $errors->first('items') ?: collect($errors->get('items.*'))->flatten()->first() }}</p>

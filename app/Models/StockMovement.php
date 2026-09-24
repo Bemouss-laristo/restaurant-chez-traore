@@ -50,7 +50,7 @@ class StockMovement extends Model
 
     public function stockItem(): BelongsTo
     {
-        return $this->belongsTo(StockItem::class);
+        return $this->belongsTo(StockItem::class)->withTrashed();
     }
 
     public function user(): BelongsTo

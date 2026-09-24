@@ -11,7 +11,7 @@
     <div>
         <x-input-label for="unit" value="Unité de mesure" />
         <select id="unit" name="unit"
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
             @foreach ($units as $value => $label)
                 <option value="{{ $value }}" @selected(old('unit', $item->unit->value ?? '') === $value)>{{ $label }}</option>
             @endforeach
@@ -39,7 +39,7 @@
     <div>
         <x-input-label for="supplier_id" value="Fournisseur habituel (facultatif)" />
         <select id="supplier_id" name="supplier_id"
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
             <option value="">— Aucun —</option>
             @foreach ($suppliers as $supplier)
                 <option value="{{ $supplier->id }}" @selected(old('supplier_id', $item->supplier_id ?? null) == $supplier->id)>{{ $supplier->name }}</option>
@@ -52,7 +52,7 @@
     <div>
         <x-input-label for="default_payment_method" value="Mode d'achat habituel" />
         <select id="default_payment_method" name="default_payment_method"
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
             <option value="">— Demander à chaque achat —</option>
             @foreach ($paymentMethods as $value => $label)
                 <option value="{{ $value }}" @selected(old('default_payment_method', $item->default_payment_method->value ?? '') === $value)>{{ $label }}</option>
@@ -108,7 +108,7 @@
     <div>
         <label class="inline-flex items-center gap-2">
             <input type="checkbox" name="is_key" value="1" @checked(old('is_key', $item->is_key ?? false))
-                class="rounded border-gray-300 text-indigo-600" />
+                class="rounded border-gray-300 text-brand-600" />
             <span class="text-sm font-medium text-gray-700">Article clé — à compter chaque soir</span>
         </label>
         <p class="mt-1 text-xs text-gray-500">Pain, poulet, boissons… Ce sont eux qui partent le plus vite et se perdent le plus.</p>

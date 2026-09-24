@@ -38,7 +38,7 @@
                 </div>
                 <div class="bg-white shadow sm:rounded-lg p-5">
                     <div class="text-sm text-gray-500">Résultat de trésorerie</div>
-                    <div class="text-2xl font-bold mt-1 {{ $report['net'] < 0 ? 'text-red-600' : 'text-indigo-600' }}">@mru($report['net'])</div>
+                    <div class="text-2xl font-bold mt-1 {{ $report['net'] < 0 ? 'text-red-600' : 'text-brand-600' }}">@mru($report['net'])</div>
                     <div class="mt-2 text-xs text-gray-500">Ce qui reste réellement après tout ce qui est sorti ce mois-ci.</div>
                 </div>
             </div>
@@ -73,9 +73,9 @@
                         <div class="text-xs text-gray-500">Salaires restant à payer</div>
                         <div class="text-lg font-semibold text-red-700">−@mru($report['salaryDue'])</div>
                     </div>
-                    <div class="rounded-md p-4 {{ ($report['netPosition'] ?? 0) < 0 ? 'bg-red-100' : 'bg-indigo-50' }}">
+                    <div class="rounded-md p-4 {{ ($report['netPosition'] ?? 0) < 0 ? 'bg-red-100' : 'bg-brand-50' }}">
                         <div class="text-xs text-gray-500">Position nette</div>
-                        <div class="text-lg font-bold {{ ($report['netPosition'] ?? 0) < 0 ? 'text-red-700' : 'text-indigo-700' }}">
+                        <div class="text-lg font-bold {{ ($report['netPosition'] ?? 0) < 0 ? 'text-red-700' : 'text-brand-700' }}">
                             {{ $report['netPosition'] === null ? '—' : number_format($report['netPosition'], 0, ',', ' ').' MRU' }}
                         </div>
                         <div class="text-xs text-gray-400 mt-1">Chiffre fiable, sans le stock</div>
@@ -105,7 +105,7 @@
                     </div>
                     <p class="mt-2 text-xs text-gray-500">
                         Ce chiffre ne vaut que ce que valent les comptages. Compte les articles clés chaque soir
-                        (<a href="{{ route('reconciliation.index') }}" class="text-indigo-600 hover:underline">comptage du soir</a>)
+                        (<a href="{{ route('reconciliation.index') }}" class="text-brand-600 hover:underline">comptage du soir</a>)
                         et il deviendra fiable en deux semaines.
                     </p>
                 </div>

@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Rapport des achats</h2>
-            <a href="{{ route('purchases.create') }}" class="text-sm font-semibold px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">+ Saisir un achat</a>
+            <a href="{{ route('purchases.create') }}" class="text-sm font-semibold px-3 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-700">+ Saisir un achat</a>
         </div>
     </x-slot>
 
@@ -11,7 +11,7 @@
             @include('reports._nav')
 
             <div class="bg-white shadow sm:rounded-lg p-3 flex flex-wrap items-center gap-2">
-                @php($tab = fn (bool $a) => $a ? 'px-4 py-2 rounded-md text-sm font-semibold bg-indigo-600 text-white' : 'px-4 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200')
+                @php($tab = fn (bool $a) => $a ? 'px-4 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white' : 'px-4 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200')
                 <a href="{{ route('reports.purchases', ['period' => 'day']) }}" class="{{ $tab($period === 'day') }}">Aujourd'hui</a>
                 <a href="{{ route('reports.purchases', ['period' => 'week']) }}" class="{{ $tab($period === 'week') }}">Cette semaine</a>
                 <a href="{{ route('reports.purchases', ['period' => 'month']) }}" class="{{ $tab($period === 'month') }}">Ce mois</a>

@@ -1,5 +1,6 @@
 <x-guest-layout>
-    <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Connexion</h2>
+    <h2 class="mb-1 text-center text-xl font-bold text-cocoa-900">Bon retour</h2>
+    <p class="mb-6 text-center text-sm text-cocoa-500">Connecte-toi pour ouvrir le service.</p>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -20,21 +21,21 @@
 
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-amber-600 shadow-sm focus:ring-amber-500" name="remember">
+                <input id="remember_me" type="checkbox" class="rounded border-cocoa-300 text-brand-600 shadow-sm focus:ring-brand-500" name="remember">
                 <span class="ms-2 text-sm text-gray-600">Se souvenir de moi</span>
             </label>
         </div>
 
         <div class="flex items-center justify-between mt-6">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
+                <a class="text-sm text-cocoa-600 underline hover:text-brand-700" href="{{ route('password.request') }}">
                     Mot de passe oublié ?
                 </a>
             @endif
 
             <button type="submit"
-                class="px-6 py-2 bg-amber-500 text-stone-900 font-semibold rounded-md hover:bg-amber-400 transition">
-                Se connecter
+                class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-2.5 font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:-translate-y-0.5 hover:bg-brand-700 active:translate-y-0">
+                Se connecter <x-icon name="arrow-right" class="h-4 w-4" />
             </button>
         </div>
     </form>

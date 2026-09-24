@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Gestion des employés</h2>
             <a href="{{ route('admin.users.create') }}"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                 + Nouvel employé
             </a>
         </div>
@@ -72,7 +72,7 @@
                                     <td class="px-4 py-3">
                                         <div class="flex items-center justify-end gap-3">
                                             <a href="{{ route('admin.users.edit', $user) }}"
-                                                class="text-indigo-600 hover:underline">Modifier</a>
+                                                class="text-brand-600 hover:underline">Modifier</a>
 
                                             <form method="POST" action="{{ route('admin.users.toggle', $user) }}">
                                                 @csrf

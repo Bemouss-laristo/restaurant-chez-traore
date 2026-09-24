@@ -73,7 +73,7 @@
                                                         <option value="{{ $value }}">{{ $label }}</option>
                                                     @endforeach
                                                 </select>
-                                                <button class="px-3 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">Payer</button>
+                                                <button class="px-3 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">Payer</button>
                                             </form>
                                         @endif
                                     </td>

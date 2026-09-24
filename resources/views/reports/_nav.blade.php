@@ -1,18 +1,33 @@
 @php
-    $tab = fn (bool $active) => $active
-        ? 'px-4 py-2 rounded-md text-sm font-semibold bg-indigo-600 text-white'
-        : 'px-4 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200';
+    // [libellé, route, motif actif, icône]
+    $tabs = [
+        ['Journalier', 'reports.daily', 'reports.daily', 'calendar'],
+        ['Hebdomadaire', 'reports.weekly', 'reports.weekly', 'calendar'],
+        ['Mensuel', 'reports.monthly', 'reports.monthly', 'chart'],
+        ['Achats', 'reports.purchases', 'reports.purchases', 'truck'],
+        ['Enveloppe du mois', 'envelope.index', 'envelope.*', 'wallet'],
+        ['Soldes', 'balances.index', 'balances.*', 'scale'],
+        ['Trésorerie', 'reports.treasury', 'reports.treasury', 'cash'],
+        ['Contrôle matière', 'reports.material', 'reports.material', 'fire'],
+        ['Contrôle stock', 'reports.stock', 'reports.stock', 'cube'],
+        ['Réconciliation', 'reconciliation.index', 'reconciliation.*', 'check'],
+    ];
 @endphp
 
-<div class="bg-white shadow sm:rounded-lg p-3 flex flex-wrap gap-2">
-    <a href="{{ route('reports.daily') }}" class="{{ $tab(request()->routeIs('reports.daily')) }}">Journalier</a>
-    <a href="{{ route('reports.weekly') }}" class="{{ $tab(request()->routeIs('reports.weekly')) }}">Hebdomadaire</a>
-    <a href="{{ route('reports.monthly') }}" class="{{ $tab(request()->routeIs('reports.monthly')) }}">Mensuel</a>
-    <a href="{{ route('reports.purchases') }}" class="{{ $tab(request()->routeIs('reports.purchases')) }}">Achats</a>
-    <a href="{{ route('envelope.index') }}" class="{{ $tab(request()->routeIs('envelope.*')) }}">Enveloppe du mois</a>
-    <a href="{{ route('balances.index') }}" class="{{ $tab(request()->routeIs('balances.*')) }}">Soldes</a>
-    <a href="{{ route('reports.treasury') }}" class="{{ $tab(request()->routeIs('reports.treasury')) }}">Trésorerie</a>
-    <a href="{{ route('reports.material') }}" class="{{ $tab(request()->routeIs('reports.material')) }}">Contrôle matière</a>
-    <a href="{{ route('reports.stock') }}" class="{{ $tab(request()->routeIs('reports.stock')) }}">Contrôle stock</a>
-    <a href="{{ route('reconciliation.index') }}" class="{{ $tab(request()->routeIs('reconciliation.*')) }}">Réconciliation</a>
-</div>
+{{-- Onglets : défilent horizontalement sur téléphone au lieu de s'empiler. --}}
+<nav class="bg-white shadow sm:rounded-lg p-2" aria-label="Rapports">
+    <div class="side-scroll flex gap-1 overflow-x-auto">
+        @foreach ($tabs as [$label, $route, $pattern, $icon])
+            @php($active = request()->routeIs($pattern))
+            <a href="{{ route($route) }}" @if ($active) aria-current="page" @endif
+                @class([
+                    'inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3.5 py-2 text-sm transition-all duration-200',
+                    'bg-brand-600 font-semibold text-white shadow-sm' => $active,
+                    'font-medium text-cocoa-700 hover:bg-brand-50 hover:text-brand-700' => ! $active,
+                ])>
+                <x-icon :name="$icon" class="h-4 w-4" />
+                {{ $label }}
+            </a>
+        @endforeach
+    </div>
+</nav>

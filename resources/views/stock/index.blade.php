@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Stock</h2>
             <a href="{{ route('stock-items.create') }}"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                 + Nouvel article
             </a>
         </div>
@@ -95,8 +95,22 @@
                                             <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">OK</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-right">
-                                        <a href="{{ route('stock-items.edit', $item) }}" class="text-indigo-600 hover:underline">Gérer</a>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center justify-end gap-1">
+                                            <a href="{{ route('stock-items.edit', $item) }}" title="Gérer"
+                                                class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand-600 transition hover:bg-brand-50">
+                                                <x-icon name="pencil" class="h-4 w-4" /> Gérer
+                                            </a>
+                                            <form method="POST" action="{{ route('stock-items.destroy', $item) }}"
+                                                onsubmit="return confirm('Supprimer « {{ addslashes($item->name) }} » ? S\'il a déjà servi, il sera archivé : son historique reste dans les rapports.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" title="Supprimer" aria-label="Supprimer {{ $item->name }}"
+                                                    class="rounded-lg p-1.5 text-cocoa-400 transition hover:bg-red-50 hover:text-red-600">
+                                                    <x-icon name="trash" class="h-4 w-4" />
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

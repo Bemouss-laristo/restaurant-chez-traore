@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Produits</h2>
             <a href="{{ route('products.create') }}"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                 + Nouveau produit
             </a>
         </div>
@@ -58,7 +58,7 @@
                         </div>
                         <div class="p-3">
                             <div class="text-xs text-gray-500">{{ $product->category->name ?? '—' }}</div>
-                            <div class="font-medium text-gray-900 group-hover:text-indigo-600">{{ $product->name }}</div>
+                            <div class="font-medium text-gray-900 group-hover:text-brand-600">{{ $product->name }}</div>
                             <div class="mt-1 font-semibold text-gray-800">@mru($product->sale_price)</div>
                         </div>
                     </a>

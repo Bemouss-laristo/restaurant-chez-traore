@@ -4,7 +4,7 @@
     <div>
         <x-input-label for="product_category_id" value="Catégorie" />
         <select id="product_category_id" name="product_category_id"
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
             <option value="">— Choisir —</option>
             @foreach ($categories as $category)
                 <option value="{{ $category->id }}"
@@ -41,7 +41,7 @@
     <div>
         <x-input-label for="description" value="Description (facultatif)" />
         <textarea id="description" name="description" rows="2"
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('description', $product->description ?? '') }}</textarea>
+            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">{{ old('description', $product->description ?? '') }}</textarea>
         <x-input-error :messages="$errors->get('description')" class="mt-2" />
     </div>
 
@@ -51,7 +51,7 @@
             <img src="{{ $isEdit ? $product->imageUrl() : asset('images/placeholders/default.svg') }}"
                 alt="Aperçu" class="h-20 w-28 object-cover rounded-md border border-gray-200" />
             <input id="image" name="image" type="file" accept="image/*"
-                class="block text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                class="block text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
         </div>
         <p class="mt-1 text-xs text-gray-500">JPG, PNG ou WebP, 2 Mo max. Sans photo, une vignette de catégorie s'affiche.</p>
         <x-input-error :messages="$errors->get('image')" class="mt-2" />
@@ -59,7 +59,7 @@
 
     <label class="flex items-center">
         <input type="checkbox" name="is_active" value="1"
-            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+            class="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500"
             @checked(old('is_active', $product->is_active ?? true)) />
         <span class="ms-2 text-sm text-gray-600">Produit actif (visible à la vente)</span>
     </label>

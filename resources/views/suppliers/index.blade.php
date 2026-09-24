@@ -55,7 +55,7 @@
                                     </td>
                                     <td class="px-3 py-2 text-right">
                                         <div class="flex items-center justify-end gap-3">
-                                            <a href="{{ route('suppliers.show', $supplier) }}" class="text-indigo-600 hover:underline">Relevé</a>
+                                            <a href="{{ route('suppliers.show', $supplier) }}" class="text-brand-600 hover:underline">Relevé</a>
                                             <button type="button" x-on:click="editing = (editing === {{ $supplier->id }} ? null : {{ $supplier->id }})"
                                                 class="text-gray-600 hover:underline">Modifier</button>
                                         </div>
@@ -82,7 +82,7 @@
                                             <div class="flex flex-wrap items-center gap-3">
                                                 <label class="inline-flex items-center gap-2 text-sm text-gray-600">
                                                     <input type="checkbox" name="is_active" value="1" @checked($supplier->is_active)
-                                                        class="rounded border-gray-300 text-indigo-600" />
+                                                        class="rounded border-gray-300 text-brand-600" />
                                                     Actif
                                                 </label>
                                                 <x-primary-button>Enregistrer</x-primary-button>

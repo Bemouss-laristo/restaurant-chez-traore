@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Historique des ventes</h2>
             <a href="{{ route('sales.create') }}"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                 + Nouvelle vente
             </a>
         </div>
@@ -33,7 +33,7 @@
                             @forelse ($sales as $sale)
                                 <tr class="hover:bg-gray-50 {{ $sale->isCancelled() ? 'bg-red-50 text-gray-400' : '' }}">
                                     <td class="px-4 py-3 font-mono text-xs">
-                                        <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">{{ $sale->sale_number }}</a>
+                                        <a href="{{ route('sales.show', $sale) }}" class="text-brand-600 hover:underline">{{ $sale->sale_number }}</a>
                                         @if ($sale->isCancelled())
                                             <span class="ms-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">ANNULÉE</span>
                                         @endif
@@ -46,7 +46,7 @@
                                     <td class="px-4 py-3 text-right">
                                         <button type="button" onclick="printTicket('{{ route('sales.receipt', $sale) }}')"
                                             class="px-2 text-gray-600 hover:underline" title="Réimprimer le ticket">🖨️</button>
-                                        <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">
+                                        <a href="{{ route('sales.show', $sale) }}" class="text-brand-600 hover:underline">
                                             {{ ! $sale->isCancelled() && $sale->canBeCancelledBy(auth()->user()) ? 'Voir / Annuler' : 'Voir' }}
                                         </a>
                                     </td>

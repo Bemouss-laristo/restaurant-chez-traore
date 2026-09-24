@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dépenses du jour</h2>
-            <a href="{{ route('caisse.index') }}" class="text-sm text-indigo-600 hover:underline">Voir la caisse</a>
+            <a href="{{ route('caisse.index') }}" class="text-sm text-brand-600 hover:underline">Voir la caisse</a>
         </div>
     </x-slot>
 
@@ -40,7 +40,7 @@
                     <div>
                         <x-input-label for="expense_category" value="Catégorie" />
                         <select id="expense_category" name="expense_category"
-                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                             @foreach ($categories as $value => $label)
                                 <option value="{{ $value }}" @selected(old('expense_category', 'achat_marchandises') === $value)>{{ $label }}</option>
                             @endforeach
@@ -57,18 +57,18 @@
                                 <div class="flex items-center gap-2">
                                     <input type="text" :name="`items[${idx}][label]`" x-model="row.label"
                                         placeholder="Article (ex : pain)" maxlength="100"
-                                        class="flex-1 min-w-0 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                        class="flex-1 min-w-0 border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                                     <input type="number" :name="`items[${idx}][price]`" x-model="row.price"
                                         placeholder="Prix" min="1" step="1" inputmode="numeric"
                                         x-on:keydown.enter.prevent="addRow()"
-                                        class="w-28 text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                        class="w-28 text-right border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                                     <button type="button" x-on:click="removeRow(idx)" title="Supprimer la ligne"
                                         class="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 text-gray-700">×</button>
                                 </div>
                             </template>
                         </div>
 
-                        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-indigo-600 hover:underline">+ Ajouter un article</button>
+                        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-brand-600 hover:underline">+ Ajouter un article</button>
 
                         @if ($errors->has('items') || $errors->has('items.*'))
                             <p class="mt-2 text-sm text-red-600">{{ $errors->first('items') ?: collect($errors->get('items.*'))->flatten()->first() }}</p>
@@ -78,7 +78,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-3">
                         <div class="text-lg">Total : <span class="font-bold text-red-700" x-text="money(total)"></span></div>
                         <button type="submit" @disabled($session === null) x-bind:disabled="{{ $session === null ? 'true' : 'false' }} || total <= 0"
-                            class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed">
                             Enregistrer la dépense
                         </button>
                     </div>
@@ -117,7 +117,7 @@
                     <div class="text-sm">
                         Total : <span class="font-semibold text-red-700">@mru($total)</span>
                         @if ($expected !== null)
-                            <span class="ms-3 text-gray-500">Caisse théorique : <span class="font-semibold text-indigo-700">@mru($expected)</span></span>
+                            <span class="ms-3 text-gray-500">Caisse théorique : <span class="font-semibold text-brand-700">@mru($expected)</span></span>
                         @endif
                     </div>
                 </div>

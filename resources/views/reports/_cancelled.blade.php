@@ -29,7 +29,7 @@
                     @php($sale = $row['sale'])
                     <tr>
                         <td class="px-3 py-2 font-mono text-xs">
-                            <a href="{{ route('sales.show', $sale) }}" class="text-indigo-600 hover:underline">{{ $sale->sale_number }}</a>
+                            <a href="{{ route('sales.show', $sale) }}" class="text-brand-600 hover:underline">{{ $sale->sale_number }}</a>
                         </td>
                         <td class="px-3 py-2 text-gray-600">{{ $sale->sold_at->format('d/m H:i') }}</td>
                         <td class="px-3 py-2 text-gray-600">{{ $row['customer'] ?? '—' }}</td>

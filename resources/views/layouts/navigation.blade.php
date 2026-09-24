@@ -1,200 +1,138 @@
-@php($pendingOrders = \App\Models\Order::pending()->count())
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="text-lg font-semibold text-gray-800 whitespace-nowrap">
-                        Chez <span class="text-amber-600">Traoré</span>
-                    </a>
-                </div>
+{{--
+    Barre latérale de l'espace de gestion.
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        Tableau de bord
-                    </x-nav-link>
+    Le menu est décrit une seule fois (liste ci-dessous) puis affiché en boucle :
+    ajouter une rubrique = ajouter une ligne. Chaque rôle ne voit que ce qui le
+    concerne ; les autorisations réelles restent vérifiées côté serveur par les routes.
+--}}
+@php
+    $user = auth()->user();
+    $manages = $user->isAdmin() || $user->isGerant();
+    $pendingOrders = \App\Models\Order::pending()->count();
 
-                    <x-nav-link :href="route('sales.create')" :active="request()->routeIs('sales.*')">
-                        Vente
-                    </x-nav-link>
+    // [libellé, route, motifs de page active, icône, pastille]
+    $sections = [
+        ['title' => null, 'items' => [
+            ['Tableau de bord', 'dashboard', ['dashboard'], 'home', null],
+        ]],
+        ['title' => 'Service', 'items' => array_values(array_filter([
+            ['Vente', 'sales.create', ['sales.*'], 'cart', null],
+            ['Caisse', 'caisse.index', ['caisse.*'], 'cash', null],
+            $user->isCaissier() ? ['Mes dépenses', 'cashier-expenses.index', ['cashier-expenses.*'], 'wallet', null] : null,
+            ['Commandes', 'orders.index', ['orders.*'], 'orders', $pendingOrders ?: null],
+        ]))],
+    ];
 
-                    <x-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
-                        Caisse
-                    </x-nav-link>
+    if ($manages) {
+        $sections[] = ['title' => 'Stock', 'items' => [
+            ['Produits', 'products.index', ['products.*'], 'tag', null],
+            ['Stock', 'stock-items.index', ['stock-items.*'], 'cube', null],
+            ['Achats', 'purchases.create', ['purchases.*'], 'truck', null],
+            ['Fournisseurs', 'suppliers.index', ['suppliers.*'], 'store', null],
+        ]];
+        $sections[] = ['title' => 'Argent', 'items' => [
+            ['Dépenses', 'expenses.index', ['expenses.*'], 'receipt', null],
+            ['Salaires', 'staff.index', ['staff.*'], 'users', null],
+            ['Rapports', 'reports.daily', ['reports.*', 'envelope.*', 'balances.*', 'reconciliation.*'], 'chart', null],
+        ]];
+    }
 
-                    @if (auth()->user()->isCaissier())
-                        <x-nav-link :href="route('cashier-expenses.index')" :active="request()->routeIs('cashier-expenses.*')">
-                            Dépenses
-                        </x-nav-link>
-                    @endif
+    if ($user->isAdmin()) {
+        $sections[] = ['title' => 'Administration', 'items' => [
+            ['Employés', 'admin.users.index', ['admin.users.*'], 'user-group', null],
+        ]];
+    }
 
-                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                        Commandes
-                        @if ($pendingOrders > 0)
-                            <span class="ms-1 inline-flex items-center justify-center px-1.5 text-xs font-bold rounded-full bg-amber-500 text-white">{{ $pendingOrders }}</span>
-                        @endif
-                    </x-nav-link>
+    $initials = collect(preg_split('/\s+/', trim($user->name)))
+        ->filter()
+        ->take(2)
+        ->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))
+        ->implode('');
 
-                    @if (auth()->user()->isAdmin() || auth()->user()->isGerant())
-                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
-                            Produits
-                        </x-nav-link>
-                        <x-nav-link :href="route('stock-items.index')" :active="request()->routeIs('stock-items.*')">
-                            Stock
-                        </x-nav-link>
-                        <x-nav-link :href="route('purchases.create')" :active="request()->routeIs('purchases.*')">
-                            Achats
-                        </x-nav-link>
-                        <x-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
-                            Fournisseurs
-                        </x-nav-link>
-                        <x-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
-                            Salaires
-                        </x-nav-link>
-                        <x-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
-                            Dépenses
-                        </x-nav-link>
-                        <x-nav-link :href="route('reports.daily')" :active="request()->routeIs('reports.*')">
-                            Rapports
-                        </x-nav-link>
-                    @endif
+    $roleStyle = match ($user->role->value) {
+        'admin' => 'bg-brand-500/20 text-brand-200 ring-brand-400/30',
+        'gerant' => 'bg-sky-400/15 text-sky-200 ring-sky-300/30',
+        default => 'bg-emerald-400/15 text-emerald-200 ring-emerald-300/30',
+    };
+@endphp
 
-                    @if (auth()->user()->isAdmin())
-                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                            Employés
-                        </x-nav-link>
-                    @endif
-                </div>
+{{-- Voile derrière le menu, sur téléphone --}}
+<div x-show="sidebarOpen" x-transition.opacity.duration.200ms x-on:click="sidebarOpen = false"
+    class="fixed inset-0 z-30 bg-cocoa-950/60 backdrop-blur-sm lg:hidden" style="display: none;" aria-hidden="true"></div>
+
+<aside
+    class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col bg-cocoa-900 text-cocoa-100 transition-transform duration-300 ease-out lg:translate-x-0"
+    x-bind:class="{ '!translate-x-0 shadow-2xl': sidebarOpen }"
+    aria-label="Menu principal">
+
+    {{-- Enseigne --}}
+    <div class="flex items-center gap-3 px-5 pb-4 pt-5">
+        <a href="{{ route('dashboard') }}" class="group flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-lg shadow-brand-900/40 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105">
+                <x-icon name="fire" class="h-6 w-6" />
+            </span>
+            <span class="leading-tight">
+                <span class="block text-base font-bold text-white">Chez <span class="text-brand-300">Traoré</span></span>
+                <span class="block text-[11px] uppercase tracking-[0.18em] text-cocoa-400">Gestion</span>
+            </span>
+        </a>
+        <button type="button" x-on:click="sidebarOpen = false"
+            class="ms-auto rounded-lg p-1.5 text-cocoa-300 hover:bg-white/10 hover:text-white lg:hidden" aria-label="Fermer le menu">
+            <x-icon name="close" class="h-5 w-5" />
+        </button>
+    </div>
+
+    {{-- Rubriques --}}
+    <nav class="side-scroll flex-1 overflow-y-auto px-3 pb-4">
+        @foreach ($sections as $section)
+            @if ($section['title'])
+                <div class="side-section">{{ $section['title'] }}</div>
+            @endif
+            <ul class="space-y-0.5">
+                @foreach ($section['items'] as [$label, $route, $patterns, $icon, $badge])
+                    @php($active = request()->routeIs(...$patterns))
+                    <li>
+                        <a href="{{ route($route) }}" @class(['side-link', 'is-active' => $active])
+                            @if ($active) aria-current="page" @endif>
+                            <x-icon :name="$icon" class="side-icon" />
+                            <span class="flex-1 truncate">{{ $label }}</span>
+                            @if ($badge)
+                                <span class="inline-flex min-w-[1.35rem] animate-soft-pulse items-center justify-center rounded-full bg-brand-500 px-1.5 text-xs font-bold text-white">
+                                    {{ $badge }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @endforeach
+    </nav>
+
+    {{-- Utilisateur connecté --}}
+    <div class="border-t border-white/10 p-3">
+        <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-300 to-brand-600 text-sm font-bold text-white ring-2 ring-white/10">
+                {{ $initials ?: '?' }}
+            </span>
+            <div class="min-w-0 flex-1">
+                <div class="truncate text-sm font-semibold text-white">{{ $user->name }}</div>
+                <span class="mt-0.5 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset {{ $roleStyle }}">
+                    {{ $user->role->label() }}
+                </span>
             </div>
-
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            Profil
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                Déconnexion
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+        </div>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+            <a href="{{ route('profile.edit') }}"
+                class="flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium text-cocoa-200 transition hover:bg-white/10 hover:text-white">
+                <x-icon name="user" class="h-4 w-4" /> Profil
+            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium text-cocoa-200 transition hover:bg-red-500/15 hover:text-red-200">
+                    <x-icon name="logout" class="h-4 w-4" /> Déconnexion
                 </button>
-            </div>
+            </form>
         </div>
     </div>
-
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                Tableau de bord
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('sales.create')" :active="request()->routeIs('sales.*')">
-                Vente
-            </x-responsive-nav-link>
-
-            <x-responsive-nav-link :href="route('caisse.index')" :active="request()->routeIs('caisse.*')">
-                Caisse
-            </x-responsive-nav-link>
-
-            @if (auth()->user()->isCaissier())
-                <x-responsive-nav-link :href="route('cashier-expenses.index')" :active="request()->routeIs('cashier-expenses.*')">
-                    Dépenses
-                </x-responsive-nav-link>
-            @endif
-
-            <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                Commandes @if ($pendingOrders > 0) ({{ $pendingOrders }}) @endif
-            </x-responsive-nav-link>
-
-            @if (auth()->user()->isAdmin() || auth()->user()->isGerant())
-                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
-                    Produits
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('stock-items.index')" :active="request()->routeIs('stock-items.*')">
-                    Stock
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('purchases.create')" :active="request()->routeIs('purchases.*')">
-                    Achats
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('suppliers.index')" :active="request()->routeIs('suppliers.*')">
-                    Fournisseurs
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('staff.index')" :active="request()->routeIs('staff.*')">
-                    Salaires
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
-                    Dépenses
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('reports.daily')" :active="request()->routeIs('reports.*')">
-                    Rapports
-                </x-responsive-nav-link>
-            @endif
-
-            @if (auth()->user()->isAdmin())
-                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                    Employés
-                </x-responsive-nav-link>
-            @endif
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    Profil
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        Déconnexion
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>
+</aside>

@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Achat de marchandises</h2>
-            <a href="{{ route('reports.material') }}" class="text-sm text-indigo-600 hover:underline">Contrôle matière →</a>
+            <a href="{{ route('reports.material') }}" class="text-sm text-brand-600 hover:underline">Contrôle matière →</a>
         </div>
     </x-slot>
 
@@ -87,10 +87,10 @@
                                     @csrf
                                     <input type="number" name="quantity" x-model="q" step="0.001" min="0"
                                         placeholder="Quantité en {{ $item->unit->value }}" required
-                                        class="w-32 text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                        class="w-32 text-right border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                                     <span class="text-sm text-gray-600" x-show="q > 0"
                                         x-text="'= ' + new Intl.NumberFormat('fr-FR').format(Math.round(q * p)) + ' MRU'"></span>
-                                    <button class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                                    <button class="px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                                         Enregistrer
                                     </button>
                                 </form>
@@ -99,7 +99,7 @@
                     </div>
                     <p class="mt-3 text-xs text-gray-500">
                         Tu peux saisir plusieurs fois dans la journée : chaque prise s'ajoute.
-                        Le détail jour par jour est dans <a href="{{ route('suppliers.index') }}" class="text-indigo-600 hover:underline">le relevé du fournisseur</a>.
+                        Le détail jour par jour est dans <a href="{{ route('suppliers.index') }}" class="text-brand-600 hover:underline">le relevé du fournisseur</a>.
                     </p>
                 </div>
             @endif
@@ -107,7 +107,7 @@
             <div class="bg-white shadow sm:rounded-lg p-6" x-data="{ open: {{ $agreed->isEmpty() ? 'true' : 'false' }} }">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <h3 class="font-medium text-gray-800">Ajouter un article à la prise du jour</h3>
-                    <button type="button" x-on:click="open = ! open" class="text-sm text-indigo-600 hover:underline"
+                    <button type="button" x-on:click="open = ! open" class="text-sm text-brand-600 hover:underline"
                         x-text="open ? 'Masquer' : 'Afficher'"></button>
                 </div>
                 <p class="text-sm text-gray-500">
@@ -121,7 +121,7 @@
                         <div>
                             <x-input-label for="cfg_item" value="Article" />
                             <select id="cfg_item" name="stock_item_id" required
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                 <option value="">— Choisir —</option>
                                 @foreach ($configurable as $item)
                                     <option value="{{ $item->id }}">{{ $item->name }} ({{ $item->unit->value }})</option>
@@ -129,13 +129,13 @@
                             </select>
                             <p class="mt-1 text-xs text-gray-500">
                                 L'article n'existe pas ?
-                                <a href="{{ route('stock-items.create') }}" class="text-indigo-600 hover:underline">Créer un article</a>
+                                <a href="{{ route('stock-items.create') }}" class="text-brand-600 hover:underline">Créer un article</a>
                             </p>
                         </div>
                         <div>
                             <x-input-label for="cfg_supplier" value="Fournisseur existant" />
                             <select id="cfg_supplier" name="supplier_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                 <option value="">— Aucun —</option>
                                 @foreach ($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -166,7 +166,7 @@
                         <div>
                             <x-input-label for="cfg_method" value="Règlement habituel" />
                             <select id="cfg_method" name="payment_method"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                 @foreach ($paymentMethods as $value => $label)
                                     <option value="{{ $value }}" @selected($value === 'credit')>{{ $label }}</option>
                                 @endforeach
@@ -192,14 +192,14 @@
                         <div>
                             <x-input-label for="supplier_id" value="Fournisseur" />
                             <select id="supplier_id" name="supplier_id" x-model="supplierId"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                 <option value="">— Achat ponctuel (sans compte) —</option>
                                 @foreach ($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('supplier_id')" class="mt-2" />
-                            <p class="mt-1 text-xs text-gray-500"><a href="{{ route('suppliers.index') }}" class="text-indigo-600 hover:underline">Gérer les fournisseurs</a></p>
+                            <p class="mt-1 text-xs text-gray-500"><a href="{{ route('suppliers.index') }}" class="text-brand-600 hover:underline">Gérer les fournisseurs</a></p>
                         </div>
                         <div>
                             <x-input-label for="spent_at" value="Date" />
@@ -209,7 +209,7 @@
                         <div>
                             <x-input-label for="payment_method" value="Payé par" />
                             <select id="payment_method" name="payment_method" x-model="paymentMethod"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                 @foreach ($paymentMethods as $value => $label)
                                     <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
@@ -227,7 +227,7 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <select :name="`lines[${idx}][stock_item_id]`" x-model="row.itemId" x-on:change="onItemChange(row)"
-                                                class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                                class="block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
                                                 <option value="">— Choisir un article —</option>
                                                 <template x-for="item in items" :key="item.id">
                                                     <option :value="item.id" x-text="item.name"></option>
@@ -235,7 +235,7 @@
                                             </select>
                                             <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-600" x-show="packOf(row)">
                                                 <input type="checkbox" :name="`lines[${idx}][pack]`" value="1" x-model="row.pack"
-                                                    class="rounded border-gray-300 text-indigo-600" />
+                                                    class="rounded border-gray-300 text-brand-600" />
                                                 <span x-text="'Saisir en ' + (packOf(row)?.pack_label || 'carton')"></span>
                                             </label>
                                         </div>
@@ -243,13 +243,13 @@
                                             <div>
                                                 <input type="number" :name="`lines[${idx}][quantity]`" x-model="row.quantity"
                                                     step="0.001" min="0" placeholder="Quantité"
-                                                    class="block w-full text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                                    class="block w-full text-right border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                                                 <div class="mt-1 text-xs text-gray-500" x-text="unitsLabel(row)"></div>
                                             </div>
                                             <div>
                                                 <input type="number" :name="`lines[${idx}][total_price]`" x-model="row.price"
                                                     step="1" min="0" placeholder="Prix payé (MRU)"
-                                                    class="block w-full text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                                    class="block w-full text-right border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                                                 <div class="mt-1 text-xs text-gray-500" x-text="unitCostLabel(row)"></div>
                                             </div>
                                         </div>
@@ -260,13 +260,13 @@
                                 </div>
                             </template>
                         </div>
-                        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-indigo-600 hover:underline">+ Ajouter un article</button>
+                        <button type="button" x-on:click="addRow()" class="mt-2 text-sm text-brand-600 hover:underline">+ Ajouter un article</button>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-3">
                         <div class="text-lg">Total de l'achat : <span class="font-bold text-red-700" x-text="money(total)"></span></div>
                         <button type="submit" x-bind:disabled="total <= 0"
-                            class="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed">
                             Enregistrer l'achat
                         </button>
                     </div>
@@ -295,7 +295,7 @@
                             <div class="mt-1 flex flex-wrap items-center gap-3">
                                 @if ($line && $line->stockItem)
                                     <button type="button" x-on:click="editing = (editing === {{ $purchase->id }} ? null : {{ $purchase->id }})"
-                                        class="text-xs text-indigo-600 hover:underline">Corriger la quantité</button>
+                                        class="text-xs text-brand-600 hover:underline">Corriger la quantité</button>
                                 @endif
                                 <form method="POST" action="{{ route('purchases.destroy', $purchase) }}"
                                     onsubmit="return confirm('Supprimer cette saisie ? Le stock et le compte du fournisseur reviendront comme avant.');">
@@ -314,9 +314,9 @@
                                     <span class="text-xs text-gray-500">{{ $line->stockItem->name }} — quantité réelle :</span>
                                     <input type="number" name="quantity" step="0.001" min="0" required
                                         value="{{ rtrim(rtrim(number_format((float) $line->quantity, 3, '.', ''), '0'), '.') }}"
-                                        class="w-32 text-right border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" />
+                                        class="w-32 text-right border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm" />
                                     <span class="text-xs text-gray-500">{{ $line->stockItem->unit->value }}</span>
-                                    <button class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-md hover:bg-indigo-700">
+                                    <button class="px-4 py-2 bg-brand-600 text-white text-xs font-semibold rounded-md hover:bg-brand-700">
                                         Enregistrer la correction
                                     </button>
                                 </form>

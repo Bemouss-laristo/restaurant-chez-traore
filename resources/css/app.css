@@ -1,3 +1,158 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Chez Traoré — espace de gestion (admin, gérant, caissier).
+ *
+ * Tout ce qui suit est rangé sous `.app-shell`, la classe posée sur le <body>
+ * du layout de gestion : le site public et le ticket de caisse ne sont pas touchés.
+ *
+ * Une partie du polissage passe par des sélecteurs globaux (cartes, tableaux,
+ * messages) plutôt que par une réécriture des 40 pages : toutes profitent ainsi
+ * du nouveau style, et les pages futures aussi, sans y penser.
+ */
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Déclarées ici explicitement : les règles globales ci-dessous en dépendent,
+   même sur une page où aucune classe animate-* ne les ferait générer. */
+@keyframes fade-up {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+    0% { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@layer components {
+    /* ----- Barre latérale ----- */
+    .side-section {
+        @apply px-3 pb-1 pt-6 text-[11px] font-semibold uppercase tracking-[0.14em] text-cocoa-400;
+    }
+
+    .side-link {
+        @apply relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cocoa-200 outline-none transition-all duration-200;
+    }
+
+    .side-link:hover {
+        @apply bg-white/5 text-white;
+    }
+
+    .side-link:focus-visible {
+        @apply ring-2 ring-brand-400;
+    }
+
+    .side-link .side-icon {
+        @apply h-5 w-5 shrink-0 text-cocoa-400 transition-all duration-200;
+    }
+
+    .side-link:hover .side-icon {
+        @apply scale-110 text-brand-300;
+    }
+
+    .side-link.is-active {
+        @apply bg-gradient-to-r from-brand-500/25 via-brand-500/10 to-transparent text-white;
+    }
+
+    .side-link.is-active .side-icon {
+        @apply text-brand-300;
+    }
+
+    .side-link.is-active::before {
+        content: '';
+        @apply absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-brand-400;
+    }
+
+    /* ----- Cartes de chiffres clés ----- */
+    .kpi-card {
+        @apply relative overflow-hidden rounded-2xl border border-cocoa-100 bg-white p-5 shadow-soft transition-all duration-300;
+    }
+
+    .kpi-card:hover {
+        @apply -translate-y-0.5 shadow-lift;
+    }
+
+    .kpi-icon {
+        @apply flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300;
+    }
+
+    .kpi-card:hover .kpi-icon {
+        @apply -rotate-6 scale-110;
+    }
+}
+
+/* ----- Cartes : toutes les pages de gestion ----- */
+.app-shell main .bg-white.shadow {
+    border-radius: 1rem;
+    border: 1px solid theme('colors.cocoa.100');
+    box-shadow: theme('boxShadow.soft');
+}
+
+/* Les blocs d'une page arrivent en cascade, un peu décalés. */
+.app-shell main > div > div > * {
+    animation: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.app-shell main > div > div > *:nth-child(2) { animation-delay: 50ms; }
+.app-shell main > div > div > *:nth-child(3) { animation-delay: 100ms; }
+.app-shell main > div > div > *:nth-child(4) { animation-delay: 150ms; }
+.app-shell main > div > div > *:nth-child(5) { animation-delay: 200ms; }
+.app-shell main > div > div > *:nth-child(n + 6) { animation-delay: 250ms; }
+
+/* ----- Tableaux ----- */
+.app-shell main table thead th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: theme('colors.cocoa.600');
+}
+
+.app-shell main table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.app-shell main table tbody tr:hover {
+    background-color: theme('colors.brand.50');
+}
+
+/* ----- Messages (succès, erreur, avertissement) ----- */
+.app-shell main :is(.bg-green-50, .bg-red-50, .bg-amber-50).border {
+    border-radius: 0.875rem;
+    animation: slide-down 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ----- Boutons principaux : léger relief au survol ----- */
+.app-shell :is(button, a)[class*='bg-brand-6'] {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.app-shell :is(button, a)[class*='bg-brand-6']:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px -8px rgba(185, 82, 8, 0.6);
+}
+
+.app-shell :is(button, a)[class*='bg-brand-6']:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* ----- Barre de défilement discrète dans le menu ----- */
+.side-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(205, 179, 156, 0.25) transparent;
+}
+
+/* Respect du réglage « réduire les animations » du système. */
+@media (prefers-reduced-motion: reduce) {
+    .app-shell *,
+    .app-shell *::before,
+    .app-shell *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

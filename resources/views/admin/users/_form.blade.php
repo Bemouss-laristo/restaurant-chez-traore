@@ -18,7 +18,7 @@
     <div>
         <x-input-label for="role" value="Rôle" />
         <select id="role" name="role"
-            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+            class="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm">
             @foreach ($roles as $value => $label)
                 <option value="{{ $value }}" @selected(old('role', $user->role->value ?? 'caissier') === $value)>
                     {{ $label }}
@@ -44,7 +44,7 @@
 
     <label class="flex items-center">
         <input type="checkbox" name="is_active" value="1"
-            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+            class="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500"
             @checked(old('is_active', $user->is_active ?? true)) />
         <span class="ms-2 text-sm text-gray-600">Compte actif</span>
     </label>

@@ -84,9 +84,14 @@ class ProductController extends Controller
     public function destroy(Product $product): RedirectResponse
     {
         // Soft delete : le produit disparaît des listes mais l'historique des ventes reste intact.
+        $name = $product->name;
         $product->delete();
 
-        return back()->with('status', 'Produit archivé.');
+        // Surtout pas back() : on reviendrait sur la fiche d'un produit archivé,
+        // qui n'existe plus pour l'application (erreur 404).
+        return redirect()
+            ->route('products.index')
+            ->with('status', '« '.$name.' » archivé : il disparaît de la carte et de la caisse, ses ventes passées restent dans les rapports.');
     }
 
     /**

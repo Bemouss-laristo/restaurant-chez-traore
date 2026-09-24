@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Contrôle matière</h2>
-            <a href="{{ route('purchases.create') }}" class="text-sm font-semibold px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">+ Saisir un achat</a>
+            <a href="{{ route('purchases.create') }}" class="text-sm font-semibold px-3 py-2 rounded-md bg-brand-600 text-white hover:bg-brand-700">+ Saisir un achat</a>
         </div>
     </x-slot>
 
@@ -22,7 +22,7 @@
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Achats de la période</div><div class="text-2xl font-bold text-red-600 mt-1">@mru($report['totals']['purchases'])</div></div>
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Consommé par les ventes</div><div class="text-2xl font-bold text-gray-800 mt-1">@mru($report['totals']['consumed'])</div></div>
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Manquant (pertes / écarts)</div><div class="text-2xl font-bold text-red-700 mt-1">@mru($report['totals']['missing'])</div></div>
-                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Valeur du stock restant</div><div class="text-2xl font-bold text-indigo-600 mt-1">@mru($report['totals']['stock'])</div></div>
+                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Valeur du stock restant</div><div class="text-2xl font-bold text-brand-600 mt-1">@mru($report['totals']['stock'])</div></div>
             </div>
 
             <div class="bg-white shadow sm:rounded-lg p-6">
@@ -99,7 +99,7 @@
                                     <td class="px-3 py-2 text-right">{{ (int) $p->qty }}</td>
                                     <td class="px-3 py-2 text-right font-medium text-green-700">@mru($p->revenue)</td>
                                     <td class="px-3 py-2 text-right text-gray-600">@mru($p->cost)</td>
-                                    <td class="px-3 py-2 text-right font-medium text-indigo-600">@mru($p->margin)</td>
+                                    <td class="px-3 py-2 text-right font-medium text-brand-600">@mru($p->margin)</td>
                                     <td class="px-3 py-2 text-right text-gray-500">{{ $p->revenue > 0 ? number_format($p->margin / $p->revenue * 100, 0, ',', ' ') : 0 }} %</td>
                                 </tr>
                             @empty

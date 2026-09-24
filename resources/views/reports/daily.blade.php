@@ -21,7 +21,7 @@
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Ventes</div><div class="text-2xl font-bold text-green-600 mt-1">@mru($report['salesTotal'])</div></div>
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Commandes</div><div class="text-2xl font-bold text-gray-800 mt-1">{{ $report['orders'] }}</div></div>
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Dépenses</div><div class="text-2xl font-bold text-red-600 mt-1">@mru($report['expensesTotal'])</div></div>
-                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Bénéfice</div><div class="text-2xl font-bold mt-1 {{ $report['profit'] < 0 ? 'text-red-600' : 'text-indigo-600' }}">@mru($report['profit'])</div></div>
+                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Bénéfice</div><div class="text-2xl font-bold mt-1 {{ $report['profit'] < 0 ? 'text-red-600' : 'text-brand-600' }}">@mru($report['profit'])</div></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -93,7 +93,7 @@
             <div class="bg-white shadow sm:rounded-lg p-6">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                     <h3 class="font-medium text-gray-800">Détail des dépenses du jour</h3>
-                    <a href="{{ route('expenses.index', ['date' => $date->toDateString()]) }}" class="text-sm text-indigo-600 hover:underline">Gérer ces dépenses →</a>
+                    <a href="{{ route('expenses.index', ['date' => $date->toDateString()]) }}" class="text-sm text-brand-600 hover:underline">Gérer ces dépenses →</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">

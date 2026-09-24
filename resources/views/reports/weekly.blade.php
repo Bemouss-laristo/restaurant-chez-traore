@@ -27,7 +27,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Ventes</div><div class="text-2xl font-bold text-green-600 mt-1">@mru($report['totals']['sales'])</div></div>
                 <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Dépenses</div><div class="text-2xl font-bold text-red-600 mt-1">@mru($report['totals']['expenses'])</div></div>
-                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Bénéfice</div><div class="text-2xl font-bold mt-1 {{ $report['totals']['profit'] < 0 ? 'text-red-600' : 'text-indigo-600' }}">@mru($report['totals']['profit'])</div></div>
+                <div class="bg-white shadow sm:rounded-lg p-5"><div class="text-sm text-gray-500">Bénéfice</div><div class="text-2xl font-bold mt-1 {{ $report['totals']['profit'] < 0 ? 'text-red-600' : 'text-brand-600' }}">@mru($report['totals']['profit'])</div></div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dépenses</h2>
             <a href="{{ route('expenses.create') }}"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-md hover:bg-indigo-700">
+                class="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-semibold rounded-md hover:bg-brand-700">
                 + Nouvelle dépense
             </a>
         </div>
@@ -33,7 +33,7 @@
                             @endforeach
                         </select>
                         <button class="px-4 py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700">Filtrer</button>
-                        <a href="{{ route('expenses.index', ['date' => \App\Support\BusinessDay::today()]) }}" class="text-sm text-indigo-600 hover:underline">Aujourd'hui</a>
+                        <a href="{{ route('expenses.index', ['date' => \App\Support\BusinessDay::today()]) }}" class="text-sm text-brand-600 hover:underline">Aujourd'hui</a>
                         @if ($date !== '' || $userId || $category !== '')
                             <a href="{{ route('expenses.index') }}" class="text-sm text-gray-600 hover:underline">Tout afficher</a>
                         @endif
@@ -77,7 +77,7 @@
                                     <td class="px-4 py-3 text-right font-medium">@mru($expense->amount)</td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center justify-end gap-3">
-                                            <a href="{{ route('expenses.edit', $expense) }}" class="text-indigo-600 hover:underline">Modifier</a>
+                                            <a href="{{ route('expenses.edit', $expense) }}" class="text-brand-600 hover:underline">Modifier</a>
                                             <form method="POST" action="{{ route('expenses.destroy', $expense) }}"
                                                 onsubmit="return confirm('Supprimer cette dépense ?');">
                                                 @csrf

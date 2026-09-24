@@ -100,6 +100,11 @@ class EnvelopeTest extends TestCase
 
     public function test_the_envelope_warns_when_money_burns_faster_than_time(): void
     {
+        // Le scénario est « 90 % dépensés en début de mois » : on fige donc la date
+        // au 3, à 21 h (en plein service). Sans cela le test échouait chaque mois
+        // à partir du 24, quand le mois écoulé rattrape les 90 % dépensés.
+        $this->travelTo(now()->startOfMonth()->addDays(2)->setTime(21, 0));
+
         $manager = User::factory()->gerant()->create();
         $month = $this->month();
         MonthPlan::create(['month' => $month, 'opening_amount' => 100000, 'user_id' => $manager->id]);
